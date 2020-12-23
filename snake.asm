@@ -1,4 +1,4 @@
-        .MODEL LARGE
+ .MODEL LARGE
         .STACK 64
        ; #include mymacros.inc
 
@@ -13,11 +13,11 @@ ScreenHighet    DW  200d
 ScrY            DW  200d
 
 ; expand points by SnakeWidth in all 8 directions
-SnakeWidth      DW  3                                                          
+SnakeWidth      DW  3                                                         
 SquareWidth     DW  ?
 
 ; num of points for Snake 1
-Sz1             DW  15h
+Sz1             DW  6h
 ; 0 for left / 1 for up / 2 for right / 3 for down
 DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
@@ -25,7 +25,7 @@ S1X             DW  6400d dup(?)
 S1Y             DW  6400d dup(?)
 
 ; Snake 2
-Sz2             DW  5
+Sz2             DW  6
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
@@ -47,15 +47,16 @@ drawSqr              PROC    FAR
                         push di
                         xor si,si
                         
+     
         draw_outer:
+        
                         cmp si,SquareWidth
                         jg draw_eee
                         XOR DI,DI
-
         draw_inner:  
                         cmp di,SquareWidth
                         jg draw_outerr
-
+                   
                         add cx,si
                         add dx,di
                         int 10h
@@ -74,10 +75,8 @@ drawSqr              PROC    FAR
 
                         add cx,si
                         sub dx,di
-
                         inc di
                         jmp draw_inner
-
         draw_outerr:   
                         inc si
                         cmp si,SquareWidth
@@ -86,6 +85,7 @@ drawSqr              PROC    FAR
         draw_eee:     
                         pop di
                         pop si
+                     
         ;-------------------------------------------------
 ;
 ;INT 10h / AH = 0Ch - change color for a single pixel.
@@ -111,7 +111,7 @@ INIT                    PROC FAR
         mov cx,Sz1
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
-        mov cx,Sz1
+                mov cx,Sz2
 initlpp2:       sub ax,SnakeWidth
                 LOOP initlpp2
 
@@ -147,6 +147,8 @@ init_draws1:
                 add di,2
                 dec BX
                 jnz init_draws1
+
+
 
 ;---------------------------------------
 ; snake 2
@@ -201,10 +203,11 @@ INIT                   ENDP
 ;-------------------------------------------------
 advancesnakes           PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
           
+              
+;---------------ERASING TAIL SNAKE1
+  Snake1Tail:  
                 mov ax,SnakeWidth
                 mov SquareWidth,ax
-
-;---------------ERASING TAIL SNAKE1
                 mov ax,Sz1
                 mov bl,2
                 mul bl
@@ -219,8 +222,11 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 mov ah,0ch
                 mov al,0                ;black
                 CALL drawSqr
-
+                jmp snake1
 ;---------------ERASING TAIL SNAKE2
+ Snake2Tail:   
+                mov ax,SnakeWidth
+                mov SquareWidth,ax
                 mov ax,Sz2
                 mov bl,2
                 mul bl
@@ -235,9 +241,9 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 mov ah,0ch
                 mov al,0                ;black
                 CALL drawSqr
-
+                jmp snake2
 ;       SHIFTING ALL S1X VALUES RIGHT FOR NEW HEAD POINT
-                mov ax,Sz1
+ snake1:               mov ax,Sz1
                 mov bl,2
                 mul bl
                 sub ax,2
@@ -257,8 +263,10 @@ advance_shift1:
                 sub si,2
                 sub di,2
                 LOOP advance_shift1
+                jmp Snake1Head
 ;-------------------------------------------------
 ;       SNAKE 2
+  Snake2:  
                 mov ax,Sz2
                 mov bl,2
                 mul bl
@@ -279,9 +287,10 @@ advance_shift2:
                 sub si,2
                 sub di,2
                 LOOP advance_shift2
+                jmp Snake2Head
 ;-------------------------------------------------
 ;-------------------------------------------------
-
+Snake1Head:
 ;       SETTING NEW HEAD
 
                 ; original head in (si,di)
@@ -322,12 +331,12 @@ advance_eee:
                 mov ah,0ch
                 mov al,clrs1
                 CALL drawSqr
-
+                jmp L1
 ;-------------------------------------------------
 ;-------SNAKE 2
 
 ;       SETTING NEW HEAD
-
+Snake2Head:
                 ; original head in (si,di)
                 mov si,S2X+2
                 mov di,S2Y+2
@@ -345,31 +354,27 @@ advance_down2:                                   ; move y down
                 add di,SnakeWidth
                 jmp advance_eee2
 advance_left2:                                   ; move x left
-                sub si,SnakeWidth       
-                sub si,SnakeWidth
+                add si,SnakeWidth       
+                add si,SnakeWidth
                 jmp advance_eee2
 advance_up2:                                     ; move y up
                 sub di,SnakeWidth
                 sub di,SnakeWidth
                 jmp advance_eee2
 advance_right2:                                  ; move x right
-                add si,SnakeWidth
-                add si,SnakeWidth
+                sub si,SnakeWidth
+                sub si,SnakeWidth
 
 advance_eee2:
                 mov S2X,si
                 mov S2Y,Di
-
                 ;DRAWING NEW HEAD
                 mov cx,S2X
                 mov dx,S2Y
                 mov ah,0ch
                 mov al,clrs2
                 CALL drawSqr
-
-
-
-                        RET
+jmp L1
 advancesnakes           ENDP
 ;-------------------------------------------------
 ;----------------------DRAW ENVIRONMENT--------------
@@ -402,45 +407,79 @@ MAIN    PROC FAR
 L1:
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
-        jnz FF                                  ;ZF = 1 if keystroke is not available.
+       ; jnz FF                                  ;ZF = 1 if keystroke is not available.
         cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz AA
         mov DirS1 , 1      
-        jmp FF                                  ;AH = BIOS scan code.
+        jmp FF1                                  ;AH = BIOS scan code.
 
 
 AA:     cmp ah,4Bh                              ;AL = ASCII character. 
         jnz BB
         mov DirS1 , 0
-        jmp FF
+        jmp FF1
 
 BB:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
         jnz CC                                  ;Up: 0x48
         mov DirS1 , 2                           ;Left: 0x4B
-        jmp FF                                  ;Right: 0x4D
+        jmp FF1                                  ;Right: 0x4D
                                                 ;Down: 0x50
 CC:     cmp ah,50h
-        jnz FF
-        mov DirS1 , 3
+        mov DirS1 , 3   
+        jz FF1
+AA2:    cmp al,77h                              ;AL = ASCII character. 
+        jnz BB2
+        mov DirS2 , 1
+        jmp FF2
 
-FF:
+BB2:     cmp al,64h                              ;And the scan codes for the arrow keys are:
+        jnz CC2                                  ;Up: 0x48
+        mov DirS2 , 0                           ;Left: 0x4B
+        jmp FF2                                  ;Right: 0x4D
+                                                ;Down: 0x50
+CC2:     cmp al,61h
+        jnz DD2 
+        mov DirS2 , 2   
+        jz FF2
+
+DD2:     cmp al,73h
+        mov DirS2 , 3   
+        jz FF2
+;FOR CAPITAL LETTERS
+AAC2:    cmp al,57h                              ;AL = ASCII character. 
+        jnz BBC2
+        mov DirS2 , 1
+        jmp FF2
+
+BBC2:     cmp al,44h                              ;And the scan codes for the arrow keys are:
+        jnz CCC2                                  ;Up: 0x48
+        mov DirS2 , 0                           ;Left: 0x4B
+        jmp FF2                                  ;Right: 0x4D
+                                                ;Down: 0x50
+CCC2:     cmp al,41h
+        jnz DDC2 
+        mov DirS2 , 2   
+        jz FF2
+
+DDC2:     cmp al,53h
+        mov DirS2 , 3   
+        jz FF2
+
+
+jmp L1        
+FF1:
         mov cx,0FFFFh                             ;For Frame Wait
 WER:    LOOP WER
-
-    ;    mov ah,06h
-   ;     mov al,0
-  ;      xor cx,cx
- ;       mov dx,0184FH
-;        int 10h
-
-
         CALL  drawEnv
-        ;add clrs1,1
-        ;add clrs2,1
-        CALL  advancesnakes
-        ;CALL  drawsnakes
+        CALL  Snake1Tail
+jmp L1
 
-        jmp L1
+FF2:
+        mov cx,0FFFFh                             ;For Frame Wait
+WER2:    LOOP WER2
+         CALL  drawEnv
+         CALL  Snake2Tail
+jmp L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         mov ah,4ch
         int 21h
@@ -448,4 +487,4 @@ WER:    LOOP WER
 MAIN    ENDP
 
                     END MAIN        ; End of the program  
-					
+				

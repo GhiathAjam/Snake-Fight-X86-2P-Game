@@ -100,9 +100,17 @@ INIT                   ENDP
 ;----------------------ADVANCE SNAKE FUNC--------------
 ;-------------------------------------------------
 advancesnakes           PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
-                                                                ; Shifts and moves
-                        
-                        
+        mov bx,offset S1X
+        add bx,1900*2 -2
+        mov cx,1899
+Shift:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift                
+       mov ax,[bx+2]
+        mov [bx],ax
+        sub [bx],2               
 
                         RET
 advancesnakes           ENDP
@@ -270,12 +278,7 @@ MAIN    PROC FAR
 L1:
         mov ah,1                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
-        jnz FF                                  ;ZF = 1 if keystroke is not available.
-        cmp ah,48h                              ;ZF = 0 if keystroke available.
-        jnz AA
-        mov DirS1 , 1      
-        jmp FF                                  ;AH = BIOS scan code.
-
+        jz L1
 AA:     cmp ah,4Bh                              ;AL = ASCII character. 
         jnz BB
         mov DirS1 , 0

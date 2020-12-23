@@ -13,10 +13,10 @@ ScreenHighet    DW  200d
 ScrY            DW  200d
 
 ; expand points by SnakeWidth in all 8 directions
-SnakeWidth      DW  13                                                          
+SnakeWidth      DW  6                                                          
 
 ; num of points for Snake 1
-Sz1             DW  5
+Sz1             DW  0Fh
 ; 0 for left / 1 for up / 2 for right / 3 for down
 DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
@@ -28,6 +28,9 @@ Sz2             DW  5
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
+
+clrs1           equ      1100b
+clrs2           equ      1101b
 
 ;-------------------------------------------------------------------------------------------------
 ;----------------------CODE SEGMENT----------------------------------
@@ -104,13 +107,22 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                         RET
 advancesnakes           ENDP
 ;-------------------------------------------------
+;----------------------DRAW ENVIRONMENT--------------
+;-------------------------------------------------
+drawEnv PROC     FAR
+
+        
+
+        RET
+drawEnv ENDP
+;-------------------------------------------------
 ;----------------------DRAW SANKE FUNC--------------
 ;-------------------------------------------------
 drawsnakes              PROC    FAR                               ;S1X,S1Y = head       ;Sz1 = size "num of points"
                         
                         mov ah,0ch
                         ;color of s1
-                        mov al,1100b
+                        mov al,clrs1
                         lea si,S1X
                         lea di,S1Y
                         mov bx,Sz1
@@ -118,16 +130,18 @@ drawsnakes              PROC    FAR                               ;S1X,S1Y = hea
                         mov cx , [si]
                         mov dx , [di]
 
-;-------------------------------------------------
+        ;-------------------------------------------------
                         push si
                         push di
                         xor si,si
                         
- draw_outer:             cmp si,SnakeWidth
+        draw_outer:
+                        cmp si,SnakeWidth
                         jg draw_eee
                         XOR DI,DI
 
- draw_inner:             cmp di,SnakeWidth
+        draw_inner:  
+                        cmp di,SnakeWidth
                         jg draw_outerr
 
                         add cx,si
@@ -152,23 +166,25 @@ drawsnakes              PROC    FAR                               ;S1X,S1Y = hea
                         inc di
                         jmp draw_inner
 
- draw_outerr:            inc si
+        draw_outerr:   
+                        inc si
                         cmp si,SnakeWidth
                         jnz draw_outer
 
- draw_eee:               pop di
+        draw_eee:     
+                        pop di
                         pop si
-;-------------------------------------------------
+        ;-------------------------------------------------
                         add si,2
                         add di,2
                         dec bx
-jnz draw_LL1
+        jnz draw_LL1
 
 ;-------------------------------------------------
 ;-------------------------------------------------
 ;-------------------------------------------------
 
-                        mov al,1001b
+                        mov al,clrs2
                         lea si,S2X
                         lea di,S2Y
                         mov bx,Sz2
@@ -177,14 +193,16 @@ draw_LL2:
                         mov dx , [di]
                         push si
                         push di
-;-------------------------------------------------
+        ;-------------------------------------------------
                         xor si,si
                         
-draw_outer2:            cmp si,SnakeWidth
+        draw_outer2:            
+                        cmp si,SnakeWidth
                         jg draw_eee2
                         XOR DI,DI
 
-draw_inner2:            cmp di,SnakeWidth
+        draw_inner2:            
+                        cmp di,SnakeWidth
                         jg draw_outerr2
 
                         add cx,si
@@ -207,26 +225,27 @@ draw_inner2:            cmp di,SnakeWidth
                         sub dx,di
 
                         inc di
-                        jmp draw_inner
+                        jmp draw_inner2
 
-draw_outerr2:                 inc si
+        draw_outerr2:                 
+                        inc si
                         cmp si,SnakeWidth
                         jnz draw_outer2
 
-;-------------------------------------------------
-draw_eee2:                   pop di
+        ;-------------------------------------------------
+        draw_eee2:                   
+                        pop di
                         pop si
                         add si,2
                         add di,2
                         dec bx
-jnz draw_LL2
-
+        jnz draw_LL2
+;
 ;INT 10h / AH = 0Ch - change color for a single pixel.
 ;input:
 ;AL = pixel color
 ;CX = column.
-;DX = row. 
-                        
+;DX = row.                
                         RET
 drawsnakes              ENDP
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -271,11 +290,22 @@ CC:     cmp ah,50h
         jnz FF
         mov DirS1 , 3
 
-        mov cx,0FFh                             ;For Frame Wait
+FF:
+        mov cx,0FFFFh                             ;For Frame Wait
 WER:    LOOP WER
 
+        mov ah,06h
+        mov al,0
+        xor cx,cx
+        mov dx,0184FH
+        int 10h
+
+
+        CALL  drawEnv
+        ;add clrs1,1
+        ;add clrs2,1
         CALL  advancesnakes
-FF:     CALL  drawsnakes
+        CALL  drawsnakes
 
         jmp L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

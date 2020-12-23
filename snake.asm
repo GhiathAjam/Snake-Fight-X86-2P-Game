@@ -16,7 +16,7 @@ ScrY            DW  200d
 SnakeWidth      DW  5                                                          
 
 ; num of points for Snake 1
-Sz1             DW  5
+Sz1             EQU  5
 ; 0 for left / 1 for up / 2 for right / 3 for down
 DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
@@ -24,7 +24,7 @@ S1X             DW  6400d dup(?)
 S1Y             DW  6400d dup(?)
 
 ; Snake 2
-Sz2             DW  5
+Sz2             EQU  5
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
@@ -96,21 +96,130 @@ INIT                   ENDP
 ;-------------------------------------------------
 ;----------------------ADVANCE SNAKE FUNC--------------
 ;-------------------------------------------------
-advancesnakes           PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+
+advancesnakes1xright          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
         mov bx,offset S1X
         add bx,1900*2 -2
         mov cx,1899
-Shift:
+Shift1:
         mov ax,[bx-2]                       ; Shifts and moves
         mov [bx],ax
         sub bx,2
-        loop Shift                
+        loop Shift1                
        mov ax,[bx+2]
+        sub ax,sz1*2
         mov [bx],ax
-        sub [bx],2               
-
                         RET
-advancesnakes           ENDP
+advancesnakes1xright           ENDP
+
+advancesnakes1xleft          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S1X
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        add ax,sz1*2
+        mov [bx],ax
+                        RET
+advancesnakes1xleft           ENDP
+
+advancesnakes2xleft          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S2X
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        add ax,sz2*2
+        mov [bx],ax
+                        RET
+advancesnakes2xleft           ENDP
+
+advancesnakes2xright          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S2X
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        sub ax,sz1*2
+        mov [bx],ax
+                        RET
+advancesnakes2xright           ENDP
+;-------------------------------------------------
+;----------------------ADVANCE SNAKE FUNC(y-axis)--------------
+;-------------------------------------------------
+
+advancesnakes1yright          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S1y
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        sub ax,sz1*2
+        mov [bx],ax
+                        RET
+advancesnakes1yright           ENDP
+
+advancesnakes1yleft          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S1y
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        add ax,sz1*2
+        mov [bx],ax
+                        RET
+advancesnakes1yleft           ENDP
+
+advancesnakes2yleft          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S2y
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        add ax,sz2*2
+        mov [bx],ax
+                        RET
+advancesnakes2yleft           ENDP
+
+advancesnakes2yright          PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
+        mov bx,offset S2y
+        add bx,1900*2 -2
+        mov cx,1899
+Shift1:
+        mov ax,[bx-2]                       ; Shifts and moves
+        mov [bx],ax
+        sub bx,2
+        loop Shift1                
+       mov ax,[bx+2]
+        sub ax,sz1*2
+        mov [bx],ax
+                        RET
+advancesnakes2yright           ENDP
+
 ;-------------------------------------------------
 ;----------------------DRAW SANKE FUNC--------------
 ;-------------------------------------------------
@@ -253,32 +362,42 @@ MAIN    PROC FAR
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
+        CALL  drawsnakes
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
-        mov ah,1                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+        mov ah,00h                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
-        jz L1
-AA:     cmp ah,4Bh                              ;AL = ASCII character. 
-        jnz BB
-        mov DirS1 , 0
-        jmp FF
+        ;jnz FF                                  ;ZF = 1 if keystroke is not available.
+        cmp ah,48h                              ;ZF = 0 if keystroke available.
+        jnz Snake1left
+        mov DirS1 , 1      
+        jmp WER                                  ;AH = BIOS scan code.
 
-BB:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
-        jnz CC                                  ;Up: 0x48
+Snake1left:     cmp ah,4Bh                              ;AL = ASCII character. 
+        jnz Snake1right
+        mov DirS1 , 0
+        jmp WER
+
+Snake1right:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
+        jnz Snake1Down                          ;Up: 0x48
         mov DirS1 , 2                           ;Left: 0x4B
-        jmp FF                                  ;Right: 0x4D
+        jmp WER                                  ;Right: 0x4D
                                                 ;Down: 0x50
 CC:     cmp ah,50h
         jnz FF
         mov DirS1 , 3
-
         mov cx,0FFh                             ;For Frame Wait
-WER:    LOOP WER
-
+WER:    
         CALL  advancesnakes
-FF:     CALL  drawsnakes
+FF:     mov ah,06h
+        mov al,0
+        xor cx,cx
+        mov dx,0184FH
+        int 10h   
+        CALL  drawsnakes
 
         jmp L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

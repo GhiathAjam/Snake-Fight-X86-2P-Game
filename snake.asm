@@ -19,14 +19,14 @@ SquareWidth     DW  ?
 ; num of points for Snake 1
 Sz1             DW  6h
 ; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  0
+DirS1           DW  3
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
 
 ; Snake 2
 Sz2             DW  6
-DirS2           DW  2
+DirS2           DW  4
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
 
@@ -243,7 +243,8 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 CALL drawSqr
                 jmp snake2
 ;       SHIFTING ALL S1X VALUES RIGHT FOR NEW HEAD POINT
- snake1:               mov ax,Sz1
+ snake1:        
+                mov ax,Sz1
                 mov bl,2
                 mul bl
                 sub ax,2
@@ -296,9 +297,11 @@ Snake1Head:
                 ; original head in (si,di)
                 mov si,S1X+2
                 mov di,S1Y+2
-
                 mov bx,DirS1
+                cmp bx,4
+                jz advance_left
                 and bx,bx
+                cmp bx,0
                 jz advance_left
                 cmp bx,1
                 jz advance_up
@@ -402,68 +405,103 @@ MAIN    PROC FAR
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+mov DirS1,4
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
-       ; jnz FF                                  ;ZF = 1 if keystroke is not available.
-        cmp ah,48h                              ;ZF = 0 if keystroke available.
-        jnz AA
+ UP:    cmp ah,48h                              ;ZF = 0 if keystroke available.
+        jnz Left
+        cmp DirS1,3
+        je L1
         mov DirS1 , 1      
         jmp FF1                                  ;AH = BIOS scan code.
-
-
-AA:     cmp ah,4Bh                              ;AL = ASCII character. 
-        jnz BB
+Left:     cmp ah,4Bh                              ;AL = ASCII character. 
+        jnz Right
+        cmp DirS1,2
+        je L1
         mov DirS1 , 0
         jmp FF1
 
-BB:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
-        jnz CC                                  ;Up: 0x48
-        mov DirS1 , 2                           ;Left: 0x4B
+Right:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
+        jnz Down
+        cmp DirS1,0
+        je L1                                  ;Up: 0x48
+        mov DirS1 , 2                          ;Left: 0x4B
         jmp FF1                                  ;Right: 0x4D
                                                 ;Down: 0x50
-CC:     cmp ah,50h
+Down:   
+        cmp ah,50h
+        jnz UP2
+        cmp DirS1,1
+        je L1  
         mov DirS1 , 3   
-        jz FF1
-AA2:    cmp al,77h                              ;AL = ASCII character. 
-        jnz BB2
+        jmp FF1
+UP2:   
+        cmp al,77h                              ;AL = ASCII character. 
+        jnz Left2
+        cmp DirS2,3
+        je L1  
         mov DirS2 , 1
         jmp FF2
 
-BB2:     cmp al,64h                              ;And the scan codes for the arrow keys are:
-        jnz CC2                                  ;Up: 0x48
+Left2:  
+        cmp al,64h                              ;And the scan codes for the arrow keys are:
+        jnz Right2                                  ;Up: 0x48
+        cmp DirS2,2
+        je L1  
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF2                                  ;Right: 0x4D
-                                                ;Down: 0x50
-CC2:     cmp al,61h
-        jnz DD2 
-        mov DirS2 , 2   
-        jz FF2
 
-DD2:     cmp al,73h
+LL1: jmp L1
+                                                ;Down: 0x50
+Right2:
+        cmp al,61h
+        jnz Down2 
+        cmp DirS2,0
+        je LL1  
+        mov DirS2 , 2   
+        jmp FF2
+
+Down2:  
+        cmp al,73h
+        jnz UpC2
+        cmp DirS2,1
+        je LL1  
         mov DirS2 , 3   
-        jz FF2
+        jmp FF2
 ;FOR CAPITAL LETTERS
-AAC2:    cmp al,57h                              ;AL = ASCII character. 
-        jnz BBC2
+UPC2:    
+        cmp al,57h                              ;AL = ASCII character. 
+        jnz LeftC2
+        cmp DirS2,3
+        je LL1  
         mov DirS2 , 1
         jmp FF2
 
-BBC2:     cmp al,44h                              ;And the scan codes for the arrow keys are:
-        jnz CCC2                                  ;Up: 0x48
+LeftC2:   
+        cmp al,44h                              ;And the scan codes for the arrow keys are:
+        jnz RightC2                                  ;Up: 0x48
+        cmp DirS2,2
+        je LL1  
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF2                                  ;Right: 0x4D
                                                 ;Down: 0x50
-CCC2:     cmp al,41h
-        jnz DDC2 
+RightC2:     
+        cmp al,41h
+        jnz DownC2 
+        cmp DirS2,0
+        je LL1  
         mov DirS2 , 2   
-        jz FF2
+        jmp FF2
 
-DDC2:     cmp al,53h
+DownC2:     
+        cmp al,53h
+        jnz LL1
+        cmp DirS2,1
+        je LL1  
         mov DirS2 , 3   
-        jz FF2
+        jmp FF2
 
 
 jmp L1        

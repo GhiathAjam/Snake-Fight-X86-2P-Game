@@ -402,11 +402,11 @@ MAIN    PROC FAR
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov DirS1,4
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
+   
  UP:    cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz Left
         cmp DirS1,3
@@ -446,7 +446,7 @@ Left2:
         cmp al,64h                              ;And the scan codes for the arrow keys are:
         jnz Right2                                  ;Up: 0x48
         cmp DirS2,2
-        je L1  
+        je LL1 
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF2                                  ;Right: 0x4D
 

@@ -19,7 +19,7 @@ SquareWidth     DW  ?
 ; num of points for Snake 1
 Sz1             DW  6h
 ; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  3
+DirS1           DW  4
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
@@ -46,10 +46,9 @@ drawSqr              PROC    FAR
                         push si
                         push di
                         xor si,si
-                        
-     
+                      
         draw_outer:
-        
+                        inc di        
                         cmp si,SquareWidth
                         jg draw_eee
                         XOR DI,DI
@@ -68,7 +67,6 @@ drawSqr              PROC    FAR
                         sub cx,si
                         sub cx,si
                         int 10h
-
                         add dx,di
                         add dx,di
                         int 10h

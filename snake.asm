@@ -48,7 +48,6 @@ drawSqr              PROC    FAR
                         xor si,si
                       
         draw_outer:
-                        inc di        
                         cmp si,SquareWidth
                         jg draw_eee
                         XOR DI,DI
@@ -109,7 +108,7 @@ INIT                    PROC FAR
         mov cx,Sz1
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
-                mov cx,Sz2
+                mov cx,Sz1
 initlpp2:       sub ax,SnakeWidth
                 LOOP initlpp2
 

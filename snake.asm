@@ -23,12 +23,16 @@ DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
+; for growing
+IsSnake1Fed     DB  0
+
 
 ; Snake 2
 Sz2             DW  5
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
+IsSnake2Fed     DB  0
 
 clrs1           equ      1100b
 clrs2           equ      1001b
@@ -46,14 +50,14 @@ drawSqr              PROC    FAR
                         push si
                         push di
                         xor si,si
-                      
-        draw_outer:
+                        dec SquareWidth
+        draw_sqr_outer:
                         cmp si,SquareWidth
-                        jg draw_eee
+                        jg draw_sqr_eee
                         XOR DI,DI
-        draw_inner:  
+        draw_sqr_inner:  
                         cmp di,SquareWidth
-                        jg draw_outerr
+                        jg draw_sqr_outerr
                    
                         add cx,si
                         add dx,di
@@ -73,13 +77,13 @@ drawSqr              PROC    FAR
                         add cx,si
                         sub dx,di
                         inc di
-                        jmp draw_inner
-        draw_outerr:   
+                        jmp draw_sqr_inner
+        draw_sqr_outerr:   
                         inc si
                         cmp si,SquareWidth
-                        jnz draw_outer
+                        jnz draw_sqr_outer
 
-        draw_eee:     
+        draw_sqr_eee:     
                         pop di
                         pop si
                      
@@ -92,6 +96,64 @@ drawSqr              PROC    FAR
 ;DX = row.                
                         RET
 drawSqr              ENDP
+
+;-------------------------------------------------
+;----------------------DRAW RECT--------------
+;-------------------------------------------------
+drawRect              PROC    FAR                             
+
+        ;-------------------------------------------------
+                        push si
+                        push di
+                        xor si,si
+                        dec SquareWidth
+                      
+        draw_rec_outer:
+                        cmp si,SquareWidth
+                        jg draw_rec_eee
+                        XOR DI,DI
+        draw_rec_inner:  
+                        cmp di,SquareWidth
+                        jg draw_rec_outerr
+                   
+                        add cx,si
+                        add dx,di
+                        int 10h
+
+                        sub dx,di
+                        sub dx,di
+                        int 10h
+
+                        sub cx,si
+                        sub cx,si
+                        int 10h
+                        add dx,di
+                        add dx,di
+                        int 10h
+
+                        add cx,si
+                        sub dx,di
+                        inc di
+                        jmp draw_rec_inner
+        draw_rec_outerr:   
+                        inc si
+                        cmp si,SquareWidth
+                        jnz draw_rec_outer
+
+        draw_rec_eee:     
+                        pop di
+                        pop si
+                     
+        ;-------------------------------------------------
+;
+;INT 10h / AH = 0Ch - change color for a single pixel.
+;input:
+;AL = pixel color
+;CX = column.
+;DX = row.                
+                        RET
+drawRect              ENDP
+
 
 ;-------------------------------------------------
 ;----------------------INIT FUNC--------------
@@ -206,12 +268,18 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
           
               
 ;---------------ERASING TAIL SNAKE1
-  Snake1Tail:  
+  Snake1Tail:
+                cmp IsSnake1Fed,1
+                jnz advance_del_tail1
+                inc Sz1
+                jmp advance_end_del_tail1
+
+advance_del_tail1:            
                 mov ax,SnakeWidth
                 mov SquareWidth,ax
                 mov ax,Sz1
-                mov bl,2
-                mul bl
+                mov bx,2
+                mul bx
                 sub ax,2
                 mov bx,ax
                 add bx,offset S1X
@@ -223,14 +291,22 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 mov ah,0ch
                 mov al,0                ;black
                 CALL drawSqr
+
+advance_end_del_tail1:
                 jmp snake1
 ;---------------ERASING TAIL SNAKE2
- Snake2Tail:   
+ Snake2Tail:  
+                cmp IsSnake2Fed,1
+                jnz advance_del_tail2
+                inc Sz2
+                jmp advance_end_del_tail2
+ 
+advance_del_tail2: 
                 mov ax,SnakeWidth
                 mov SquareWidth,ax
                 mov ax,Sz2
-                mov bl,2
-                mul bl
+                mov bx,2
+                mul bx
                 sub ax,2
                 mov bx,ax
                 add bx,offset S2X
@@ -242,12 +318,14 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 mov ah,0ch
                 mov al,0                ;black
                 CALL drawSqr
+
+advance_end_del_tail2:
                 jmp snake2
 ;       SHIFTING ALL S1X VALUES RIGHT FOR NEW HEAD POINT
  snake1:        
                 mov ax,Sz1
-                mov bl,2
-                mul bl
+                mov bx,2
+                mul bx
                 sub ax,2
 
                 mov si,offset S1X
@@ -270,8 +348,8 @@ advance_shift1:
 ;       SNAKE 2
   Snake2:  
                 mov ax,Sz2
-                mov bl,2
-                mul bl
+                mov bx,2
+                mul bx
                 sub ax,2
 
                 mov si,offset S2X
@@ -330,10 +408,13 @@ advance_eee:
                 mov S1Y,Di
 
                 ;DRAWING NEW HEAD
+                mov ax,SnakeWidth
+                mov SquareWidth,ax
                 mov cx,S1X
                 mov dx,S1Y
                 mov ah,0ch
                 mov al,clrs1
+
                 CALL drawSqr
                 jmp L1
 ;-------------------------------------------------
@@ -373,6 +454,8 @@ advance_eee2:
                 mov S2X,si
                 mov S2Y,Di
                 ;DRAWING NEW HEAD
+                mov ax,SnakeWidth
+                mov SquareWidth,ax
                 mov cx,S2X
                 mov dx,S2Y
                 mov ah,0ch
@@ -380,6 +463,23 @@ advance_eee2:
                 CALL drawSqr
 jmp L1
 advancesnakes           ENDP
+
+;-------------------------------------------------
+;----------------------FEED SNAKE FUNC--------------            ; this works by telling advance snake function not to delete tail next time snake moves
+;-------------------------------------------------
+feedsnake               PROC    FAR                             ; Snake num  as parameter in AX
+
+        cmp ax,1
+        jnz feed_s2
+        mov IsSnake1Fed,1
+        jmp feed_eee
+
+feed_s2:
+        mov IsSnake2Fed,1        
+
+feed_eee:
+                        RET
+feedsnake               ENDP
 ;-------------------------------------------------
 ;----------------------DRAW ENVIRONMENT--------------
 ;-------------------------------------------------
@@ -406,8 +506,16 @@ MAIN    PROC FAR
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+mov bp,1
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
+        mov ax,1
+        sub ax,bp
+        mov bp,ax
+
+        mov ax,bp
+        inc ax
+        CALL feedsnake
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
    
@@ -455,6 +563,7 @@ Left2:
         jmp FF2                                  ;Right: 0x4D
 
 LL1: jmp L1
+
                                                 ;Down: 0x50
 Right2:
         cmp al,64h
@@ -498,7 +607,7 @@ RightC2:
 
 DownC2:     
         cmp al,53h
-        jnz LL1
+        jnz LL1  
         cmp DirS2,1
         je LL1  
         mov DirS2 , 3   

@@ -12,21 +12,21 @@ ScrX            DW  320d
 ScreenHighet    DW  200d
 ScrY            DW  200d
 
-; expand points by SnakeWidth in all 8 directions
-SnakeWidth      DW  3                                                         
+; expand points by SnakeWidth in all 8 directions       320d % (2*sankewidth+1) == 0 
+SnakeWidth      DW  4                                                         
 SquareWidth     DW  ?
 
 ; num of points for Snake 1
-Sz1             DW  6h
+Sz1             DW  5h
 ; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  4
+DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
 
 ; Snake 2
-Sz2             DW  6
-DirS2           DW  4
+Sz2             DW  2
+DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
 
@@ -100,11 +100,14 @@ INIT                    PROC FAR
         ; Y of all points
         mov dx,ScrY
         sub dx,SnakeWidth               
-        sub dx,15
+        sub dx,SnakeWidth               
+        sub dx,SnakeWidth               
 
         ; common X factor of all points in snake1
         mov ax,ScrX
-        sub ax,10
+        sub ax,SnakeWidth
+        sub ax,SnakeWidth
+         sub ax,SnakeWidth
         mov cx,Sz1
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
@@ -152,7 +155,8 @@ init_draws1:
 
         ; common X factor of all points in snake2
         mov ax,SnakeWidth
-        add ax,10
+        add ax,SnakeWidth
+        add ax,SnakeWidth
 
         ; parameters for loop
         mov cx,Sz2

@@ -379,6 +379,7 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 cmp IsSnake1Fed,1
                 jnz advance_del_tail1
                 inc Sz1
+                mov IsSnake1Fed,0
                 jmp advance_end_del_tail1
 
 advance_del_tail1:            
@@ -406,6 +407,7 @@ advance_end_del_tail1:
                 cmp IsSnake2Fed,1
                 jnz advance_del_tail2
                 inc Sz2
+                mov IsSnake1Fed,0
                 jmp advance_end_del_tail2
  
 advance_del_tail2: 
@@ -604,16 +606,10 @@ MAIN    PROC FAR
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov bp,1
+; mov bp,1
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
-        mov ax,1
-        sub ax,bp
-        mov bp,ax
-
-        mov ax,bp
-        inc ax
-        CALL feedsnake
+        ; CALL feedsnake
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
    

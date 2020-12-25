@@ -24,9 +24,9 @@ SnakeWidth      DW  4
 SquareWidth     DW  ?
 
 ; num of points for Snake 1
-Sz1             DW  23d
+Sz1             DW  5d
 ; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  0
+DirS1           DW  4
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
@@ -36,7 +36,7 @@ IsSnake1Fed     DB  0
 
 ; Snake 2
 Sz2             DW  5
-DirS2           DW  2
+DirS2           DW  4
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
 IsSnake2Fed     DB  0
@@ -578,11 +578,11 @@ feedsnake               PROC    FAR                             ; Snake num  as 
 
         cmp ax,1
         jnz feed_s2
-        mov IsSnake1Fed,1
+        mov IsSnake1Fed,0
         jmp feed_eee
 
 feed_s2:
-        mov IsSnake2Fed,1        
+        mov IsSnake2Fed,0        
 
 feed_eee:
                         RET

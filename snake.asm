@@ -1,4 +1,4 @@
- .MODEL LARGE
+        .MODEL LARGE
         .STACK 64
        ; #include mymacros.inc
 
@@ -12,12 +12,19 @@ ScrX            DW  320d
 ScreenHighet    DW  200d
 ScrY            DW  200d
 
-; expand points by SnakeWidth in all 8 directions       320d % (2*sankewidth+1) == 0 
+; max grid x and y (inner grid w/o borders)     38*23 squares fit inside grid eaxh square is 9*9 pixels
+GridX           DW  38d
+GridY           DW  23d
+
+sqrX            DW  9
+sqrY            DW  9
+
+; expand points by SnakeWidth in all 8 directions        320d % (2*sankewidth+1) == 0 
 SnakeWidth      DW  4                                                         
 SquareWidth     DW  ?
 
 ; num of points for Snake 1
-Sz1             DW  5h
+Sz1             DW  23d
 ; 0 for left / 1 for up / 2 for right / 3 for down
 DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)

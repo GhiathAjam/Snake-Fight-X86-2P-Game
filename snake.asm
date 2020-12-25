@@ -401,7 +401,7 @@ advance_del_tail1:
                 CALL drawRect
 
 advance_end_del_tail1:
-                jmp snake1
+               
 ;---------------ERASING TAIL SNAKE2
  Snake2Tail:  
                 cmp IsSnake2Fed,1
@@ -429,7 +429,7 @@ advance_del_tail2:
                 CALL drawRect
 
 advance_end_del_tail2:
-                jmp snake2
+                
 ;       SHIFTING ALL S1X VALUES RIGHT FOR NEW HEAD POINT
  snake1:        
                 mov ax,Sz1
@@ -452,7 +452,7 @@ advance_shift1:
                 sub si,2
                 sub di,2
                 LOOP advance_shift1
-                jmp Snake1Head
+                
 ;-------------------------------------------------
 ;       SNAKE 2
   Snake2:  
@@ -476,7 +476,7 @@ advance_shift2:
                 sub si,2
                 sub di,2
                 LOOP advance_shift2
-                jmp Snake2Head
+              
 ;-------------------------------------------------
 ;-------------------------------------------------
 Snake1Head:
@@ -525,7 +525,7 @@ advance_eee:
                 mov al,clrs1
 
                 CALL drawRect
-                jmp L1
+                
 ;-------------------------------------------------
 ;-------SNAKE 2
 
@@ -610,8 +610,17 @@ MAIN    PROC FAR
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
         ; CALL feedsnake
+        mov cx,0FFFFh                             ;For Frame Wait
+        WER1:    LOOP WER1
+        mov ah,01
+        int 16h
+        JZ FFF1
+        
+
+
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
+
    
  UP:    cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz Left
@@ -646,7 +655,9 @@ UP2:
         cmp DirS2,3
         je L1  
         mov DirS2 , 1
-        jmp FF2
+        jmp FF1
+FFF1:jmp FF1
+
 
 Left2:  
         cmp al,61h                              ;And the scan codes for the arrow keys are:
@@ -654,10 +665,9 @@ Left2:
         cmp DirS2,2
         je LL1 
         mov DirS2 , 0                           ;Left: 0x4B
-        jmp FF2                                  ;Right: 0x4D
+        jmp FF1                                  ;Right: 0x4D
 
 LL1: jmp L1
-
                                                 ;Down: 0x50
 Right2:
         cmp al,64h
@@ -665,7 +675,7 @@ Right2:
         cmp DirS2,0
         je LL1  
         mov DirS2 , 2   
-        jmp FF2
+        jmp FF1
 
 Down2:  
         cmp al,73h
@@ -673,7 +683,7 @@ Down2:
         cmp DirS2,1
         je LL1  
         mov DirS2 , 3   
-        jmp FF2
+        jmp FF1
 ;FOR CAPITAL LETTERS
 UPC2:    
         cmp al,57h                              ;AL = ASCII character. 
@@ -681,7 +691,7 @@ UPC2:
         cmp DirS2,3
         je LL1  
         mov DirS2 , 1
-        jmp FF2
+        jmp FF1
 
 LeftC2:   
         cmp al,41h                              ;And the scan codes for the arrow keys are:
@@ -689,7 +699,7 @@ LeftC2:
         cmp DirS2,2
         je LL1  
         mov DirS2 , 0                           ;Left: 0x4B
-        jmp FF2                                  ;Right: 0x4D
+        jmp FF1                                 ;Right: 0x4D
                                                 ;Down: 0x50
 RightC2:     
         cmp al,44h
@@ -697,7 +707,7 @@ RightC2:
         cmp DirS2,0
         je LL1  
         mov DirS2 , 2   
-        jmp FF2
+        jmp FF1
 
 DownC2:     
         cmp al,53h
@@ -705,23 +715,29 @@ DownC2:
         cmp DirS2,1
         je LL1  
         mov DirS2 , 3   
-        jmp FF2
+        jmp FF1
 
 
 jmp L1        
 FF1:
         mov cx,0FFFFh                             ;For Frame Wait
 WER:    LOOP WER
+        mov cx,0FFFFh                             ;For Frame Wait
+WER2:    LOOP WER2
+        mov cx,0FFFFh                             ;For Frame Wait
+WER3:   LOOP WER3
+        mov cx,0FFFFh                             ;For Frame Wait
+WER4:   LOOP WER4
+        mov cx,0FFFFh                             ;For Frame Wait
+WER5:   LOOP WER5
+        mov cx,0FFFFh                             ;For Frame Wait
+WER6:   LOOP WER6
+      
+
         ; CALL  drawEnv
         CALL  Snake1Tail
 jmp L1
 
-FF2:
-        mov cx,0FFFFh                             ;For Frame Wait
-WER2:    LOOP WER2
-        ;  CALL  drawEnv
-         CALL  Snake2Tail
-jmp L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         mov ah,4ch
         int 21h

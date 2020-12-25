@@ -34,8 +34,14 @@ S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
 IsSnake2Fed     DB  0
 
-clrs1           equ      1100b
-clrs2           equ      1001b
+clrs1           equ     1100b
+clrs2           equ     1001b
+
+clr_BackGround  equ     1111b
+
+clr_top_border  equ     1111b
+
+clr_side_border  equ     1111b
 
 ;-------------------------------------------------------------------------------------------------
 ;----------------------CODE SEGMENT----------------------------------
@@ -50,7 +56,6 @@ drawSqr              PROC    FAR
                         push si
                         push di
                         xor si,si
-                        dec SquareWidth
         draw_sqr_outer:
                         cmp si,SquareWidth
                         jg draw_sqr_eee
@@ -144,6 +149,7 @@ drawRect              PROC    FAR
                         pop di
                         pop si
                      
+                     inc SquareWidth
         ;-------------------------------------------------
 ;
 ;INT 10h / AH = 0Ch - change color for a single pixel.
@@ -154,11 +160,105 @@ drawRect              PROC    FAR
                         RET
 drawRect              ENDP
 
+;-------------------------------------------------
+;----------------------DRAW ENVIRONMENT--------------
+;-------------------------------------------------
+drawEnv PROC     FAR
+
+        ; mov ah,0ch
+        ; mov al,clr_BackGround
+
+        ; Scroll to color BG Faster , still needs work and am lazy hh
+        mov ah,06h
+        xor al,al
+        mov bh,0EFh             ; combination of two colors refer to help.txt
+        xor cx,cx
+        mov dx,184fh
+       ; int 10h
+        
+
+        ;draw horizontal line at top of screen
+        mov ax,4
+        mov SquareWidth,ax
+
+        xor cx,cx
+        mov dx,4
+        mov ah,0Ch
+        mov al,clr_top_border
+drawEnv_top_line:               
+       CALL drawSqr
+        inc cx
+        inc cx
+        cmp cx,319d
+        jl drawEnv_top_line
+
+
+        ;draw horizontal line at bottom of screen
+        mov ax,4
+        mov SquareWidth,ax
+
+        mov cx,1
+        mov dx,ScrY
+        sub dx,4
+        mov ah,0Ch
+        mov al,clr_top_border
+drawEnv_btm_line:               
+        CALL drawSqr
+        inc cx
+        inc cx
+        cmp cx,320d
+        jl drawEnv_btm_line
+
+
+
+        ;draw left side line of screen
+        mov ax,6
+        mov SquareWidth,ax
+
+        xor dx,dx
+        mov cx,4
+        mov ah,0Ch
+        mov al,clr_side_border
+drawEnv_lft_line:               
+        CALL drawSqr
+        inc dx
+        inc dx
+        cmp dx,201d
+        jl drawEnv_lft_line
+
+        ;draw right side line of screen
+        mov ax,5
+        mov SquareWidth,ax
+
+        xor dx,dx
+        mov cx,ScrX
+        sub cx,5
+        mov ah,0Ch
+        mov al,clr_side_border
+drawEnv_rght_line:               
+        CALL drawSqr
+        inc dx
+        inc dx
+        cmp dx,201d
+        jl drawEnv_rght_line
+
+
+
+;
+;INT 10h / AH = 0Ch - change color for a single pixel.
+;input:
+;AL = pixel color
+;CX = column.
+;DX = row.                
+
+        RET
+drawEnv ENDP
 
 ;-------------------------------------------------
 ;----------------------INIT FUNC--------------
 ;-------------------------------------------------
 INIT                    PROC FAR
+        CALL drawEnv
         ; Y of all points
         mov dx,ScrY
         sub dx,SnakeWidth               
@@ -169,7 +269,7 @@ INIT                    PROC FAR
         mov ax,ScrX
         sub ax,SnakeWidth
         sub ax,SnakeWidth
-         sub ax,SnakeWidth
+        sub ax,SnakeWidth
         mov cx,Sz1
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
@@ -204,7 +304,7 @@ init_L1:
 init_draws1:
                 mov cx,[si]
                 mov dx,[di]
-                CALL drawSqr
+                CALL drawRect
                 add si,2
                 add di,2
                 dec BX
@@ -253,7 +353,7 @@ init_L2:
 init_draws2:
                 mov cx,[si]
                 mov dx,[di]
-                CALL drawSqr
+                CALL drawRect
                 add si,2
                 add di,2
                 dec BX
@@ -290,7 +390,7 @@ advance_del_tail1:
 
                 mov ah,0ch
                 mov al,0                ;black
-                CALL drawSqr
+                CALL drawRect
 
 advance_end_del_tail1:
                 jmp snake1
@@ -317,7 +417,7 @@ advance_del_tail2:
 
                 mov ah,0ch
                 mov al,0                ;black
-                CALL drawSqr
+                CALL drawRect
 
 advance_end_del_tail2:
                 jmp snake2
@@ -415,7 +515,7 @@ advance_eee:
                 mov ah,0ch
                 mov al,clrs1
 
-                CALL drawSqr
+                CALL drawRect
                 jmp L1
 ;-------------------------------------------------
 ;-------SNAKE 2
@@ -460,7 +560,7 @@ advance_eee2:
                 mov dx,S2Y
                 mov ah,0ch
                 mov al,clrs2
-                CALL drawSqr
+                CALL drawRect
 jmp L1
 advancesnakes           ENDP
 
@@ -480,15 +580,6 @@ feed_s2:
 feed_eee:
                         RET
 feedsnake               ENDP
-;-------------------------------------------------
-;----------------------DRAW ENVIRONMENT--------------
-;-------------------------------------------------
-drawEnv PROC     FAR
-
-        
-
-        RET
-drawEnv ENDP
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ;|||||||||||||||||||||      MAIN FUNC       ||||||||||||||||||||||||
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -618,14 +709,14 @@ jmp L1
 FF1:
         mov cx,0FFFFh                             ;For Frame Wait
 WER:    LOOP WER
-        CALL  drawEnv
+        ; CALL  drawEnv
         CALL  Snake1Tail
 jmp L1
 
 FF2:
         mov cx,0FFFFh                             ;For Frame Wait
 WER2:    LOOP WER2
-         CALL  drawEnv
+        ;  CALL  drawEnv
          CALL  Snake2Tail
 jmp L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

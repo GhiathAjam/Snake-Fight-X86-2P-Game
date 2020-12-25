@@ -1,13 +1,14 @@
+;This code is for drawing the food in random location for a specific time
 .model small
 .Stack 64
 .data 
-;put the img data outputed by python script here:
 a dw ?
 stop_x dw ?
 stop_y dw ?
 temp_cx dw ?
 imgW equ 64
 imgH equ 64
+; pixels colors of the images
 img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -115,15 +116,14 @@ img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 change_x_y proc
 xor ax, ax
 int 1ah			;get random value from the ticks of the clock cx:dx
-mov bl, dl
-int 1ah
-mov bh, dl
-mov ax, bx		;mov the random value to reg ax from dx
+mov bl, dl		;put the most changable byte of dx in bl
+int 1ah			;call the same interrupt to get another value in dx
+mov bh, dl		;put the most changable byte of dx in bl again
+mov ax, bx		;mov the random value to reg ax from bx
 
 mov dx, 00h
-mov bx, 640		;the width of the screen
-div bx			;mod the random value with the width to get a random number from 0 to 639
-inc dx			;increment the random value by 1 so that the range will be from 1 to 640
+mov bx, 641		;the width of the screen
+div bx			;mod the random value with the width to get a random number from 0 to 640
 mov si, dx		;initialize reg si with the value
 
 ;get the random value for the y axis
@@ -136,9 +136,8 @@ mov bh, dl
 mov ax, bx
 
 mov dx, 00h
-mov bx, 400		;the height of the screen
-div bx			;dx now has the value form 0 to 399
-inc dx			;;increment the random value by 1 so that the range will be from 1 to 400
+mov bx, 401		;the height of the screen
+div bx			;dx now has the value form 0 to 400
 mov cx, si		;mov the value of si to cx as cx changes throught the program
 
 ret
@@ -151,13 +150,13 @@ MAIN PROC FAR
 	       MOV AH,0Bh   	;set the configuration
 	       ;MOV CX, imgW  	;set the width (X) up to 64 (based on image resolution)
 	       ;MOV DX, imgH 	;set the hieght (Y) up to 64 (based on image resolution)
-		   again:
-		   call change_x_y
-		   mov stop_x, cx
+	again:
+		   call change_x_y	;call function that return random numbers in cx and dx
+		   mov stop_x, cx	;copy the values of cx & dx into external variables
 		   mov stop_y, dx
-		   mov temp_cx, cx
-		   pushf
-		   sub stop_x, imgW
+		   mov temp_cx, cx	;store cx into a variable to reinitialize cx with it
+		   pushf			;push the flag register in case of errors from the following sub. operation
+		   sub stop_x, imgW	;subtract the width of the image from cx so as to know where i will stop
 		   sub stop_y, imgH
 		   popf
 		   mov DI, offset img  ; to iterate over the pixels
@@ -178,20 +177,16 @@ MAIN PROC FAR
 	       JZ  click   	;  both x and y reached 00 so end program
 		   Jmp Drawit
 	click:
-	;mov ah, 1
-	;int 16h
-	;jz click
-	;mov ah, 0
-	;int 16h
-	MOV CX, 1eH
-	MOV DX, 8480H
-	MOV AH, 86H
-	INT 15H
-	; clear the screen
-	mov ax, 4F02h    
-	mov bx, 0100h    
-	INT 10h
-	jmp again
+			; delay function
+			MOV CX, 1eH		;cx:dx is used as a register of the time in microsec.
+			MOV DX, 8480H
+			MOV AH, 86H	
+			INT 15H			;delay interrupt int 15h / ah = 86h
+			; clear the screen
+			mov ax, 4F02h    
+			mov bx, 0100h    
+			INT 10h
+			jmp again
 
 	ENDING:
 	MAIN ENDP

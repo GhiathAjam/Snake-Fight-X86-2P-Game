@@ -25,7 +25,7 @@ S1X             DW  6400d dup(?)
 S1Y             DW  6400d dup(?)
 
 ; Snake 2
-Sz2             DW  2
+Sz2             DW  5
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
@@ -358,16 +358,16 @@ advance_down2:                                   ; move y down
                 add di,SnakeWidth
                 jmp advance_eee2
 advance_left2:                                   ; move x left
-                add si,SnakeWidth       
-                add si,SnakeWidth
+                sub si,SnakeWidth       
+                sub si,SnakeWidth
                 jmp advance_eee2
 advance_up2:                                     ; move y up
                 sub di,SnakeWidth
                 sub di,SnakeWidth
                 jmp advance_eee2
 advance_right2:                                  ; move x right
-                sub si,SnakeWidth
-                sub si,SnakeWidth
+                add si,SnakeWidth
+                add si,SnakeWidth
 
 advance_eee2:
                 mov S2X,si
@@ -447,7 +447,7 @@ UP2:
         jmp FF2
 
 Left2:  
-        cmp al,64h                              ;And the scan codes for the arrow keys are:
+        cmp al,61h                              ;And the scan codes for the arrow keys are:
         jnz Right2                                  ;Up: 0x48
         cmp DirS2,2
         je LL1 
@@ -457,7 +457,7 @@ Left2:
 LL1: jmp L1
                                                 ;Down: 0x50
 Right2:
-        cmp al,61h
+        cmp al,64h
         jnz Down2 
         cmp DirS2,0
         je LL1  
@@ -481,7 +481,7 @@ UPC2:
         jmp FF2
 
 LeftC2:   
-        cmp al,44h                              ;And the scan codes for the arrow keys are:
+        cmp al,41h                              ;And the scan codes for the arrow keys are:
         jnz RightC2                                  ;Up: 0x48
         cmp DirS2,2
         je LL1  
@@ -489,7 +489,7 @@ LeftC2:
         jmp FF2                                  ;Right: 0x4D
                                                 ;Down: 0x50
 RightC2:     
-        cmp al,41h
+        cmp al,44h
         jnz DownC2 
         cmp DirS2,0
         je LL1  

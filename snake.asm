@@ -26,7 +26,7 @@ SquareWidth     DW  ?
 ; num of points for Snake 1
 Sz1             DW  5d
 ; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  4
+DirS1           DW  0
 ; points  of snake (snakewidth*2 away from each other)
 S1X             DW  6400d dup(?)            
 S1Y             DW  6400d dup(?)
@@ -36,7 +36,7 @@ IsSnake1Fed     DB  0
 
 ; Snake 2
 Sz2             DW  5
-DirS2           DW  4
+DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
 IsSnake2Fed     DB  0

@@ -12,14 +12,14 @@ ScrX            DW  320d
 ScreenHighet    DW  200d
 ScrY            DW  200d
 
-; max grid x and y (inner grid w/o borders)     38*23 squares fit inside grid eaxh square is 9*9 pixels
-GridX           DW  38d
-GridY           DW  23d
+; (inner grid w/o borders)     39*21 squares fit inside grid each square is 9*9 pixels
+GridX           DW  39d
+GridY           DW  21d
 
 sqrX            DW  9
 sqrY            DW  9
 
-; expand points by SnakeWidth in all 8 directions        320d % (2*sankewidth+1) == 0 
+; expand points by SnakeWidth in all 8 directions      
 SnakeWidth      DW  4                                                         
 SquareWidth     DW  ?
 
@@ -35,7 +35,7 @@ IsSnake1Fed     DB  0
 
 
 ; Snake 2
-Sz2             DW  5
+Sz2             DW  5d
 DirS2           DW  2
 S2X             DW  6400d dup(?)
 S2Y             Dw  6400d dup(?)
@@ -178,40 +178,39 @@ drawEnv PROC     FAR
         ; Scroll to color BG Faster , still needs work and am lazy hh
         mov ah,06h
         xor al,al
-        mov bh,0EFh             ; combination of two colors refer to help.txt
+        mov bh,0F5h             ; combination of two colors refer to help.txt
         xor cx,cx
         mov dx,184fh
-       ; int 10h
+        ; int 10h
         
 
         ;draw horizontal line at top of screen
-        mov ax,4
+        mov ax,1
         mov SquareWidth,ax
 
         xor cx,cx
-        mov dx,4
+        mov dx,27d
         mov ah,0Ch
         mov al,clr_top_border
 drawEnv_top_line:               
        CALL drawSqr
         inc cx
-        inc cx
+        ; inc cx
         cmp cx,319d
         jl drawEnv_top_line
 
 
         ;draw horizontal line at bottom of screen
-        mov ax,4
+        mov ax,1
         mov SquareWidth,ax
 
         mov cx,1
         mov dx,ScrY
-        sub dx,4
+        sub dx,2
         mov ah,0Ch
         mov al,clr_top_border
 drawEnv_btm_line:               
         CALL drawSqr
-        inc cx
         inc cx
         cmp cx,320d
         jl drawEnv_btm_line
@@ -219,34 +218,36 @@ drawEnv_btm_line:
 
 
         ;draw left side line of screen
-        mov ax,6
+        mov ax,3
         mov SquareWidth,ax
 
         xor dx,dx
-        mov cx,4
+        mov cx,2
         mov ah,0Ch
         mov al,clr_side_border
 drawEnv_lft_line:               
         CALL drawSqr
         inc dx
         inc dx
-        cmp dx,201d
+        inc dx
+        cmp dx,200d
         jl drawEnv_lft_line
 
         ;draw right side line of screen
-        mov ax,5
+        mov ax,3
         mov SquareWidth,ax
 
         xor dx,dx
         mov cx,ScrX
-        sub cx,5
+        sub cx,3
         mov ah,0Ch
         mov al,clr_side_border
 drawEnv_rght_line:               
         CALL drawSqr
         inc dx
         inc dx
-        cmp dx,201d
+        inc dx
+        cmp dx,200d
         jl drawEnv_rght_line
 
 
@@ -270,13 +271,12 @@ INIT                    PROC FAR
         mov dx,ScrY
         sub dx,SnakeWidth               
         sub dx,SnakeWidth               
-        sub dx,SnakeWidth               
 
         ; common X factor of all points in snake1
         mov ax,ScrX
         sub ax,SnakeWidth
         sub ax,SnakeWidth
-        sub ax,SnakeWidth
+        ; sub ax,SnakeWidth
         mov cx,Sz1
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
@@ -325,7 +325,7 @@ init_draws1:
         ; common X factor of all points in snake2
         mov ax,SnakeWidth
         add ax,SnakeWidth
-        add ax,SnakeWidth
+        ; add ax,SnakeWidth
 
         ; parameters for loop
         mov cx,Sz2
@@ -734,8 +734,7 @@ WER5:   LOOP WER5
 WER6:   LOOP WER6
       
 
-        ; CALL  drawEnv
-        CALL  Snake1Tail
+        CALL  advancesnakes
 jmp L1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

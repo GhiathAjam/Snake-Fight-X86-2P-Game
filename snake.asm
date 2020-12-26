@@ -580,11 +580,11 @@ feedsnake               PROC    FAR                             ; Snake num  as 
 
         cmp ax,1
         jnz feed_s2
-        mov IsSnake1Fed,0
+        mov IsSnake1Fed,1
         jmp feed_eee
 
 feed_s2:
-        mov IsSnake2Fed,0        
+        mov IsSnake2Fed,1        
 
 feed_eee:
                         RET

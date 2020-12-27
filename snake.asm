@@ -7,48 +7,105 @@
 ;-------------------------------------------------------------------------------------------------
         .DATA
 
-ScreenWidth     DW  320d
-ScrX            DW  320d
-ScreenHighet    DW  200d
-ScrY            DW  200d
+AD;-------------------------------------------------------------------------------------------------
+;----------------------FOOD STUFF----------------------------------
+;-------------------------------------------------------------------------------------------------
 
-; (inner grid w/o borders)     39*21 squares fit inside grid each square is 9*9 pixels
-GridX           DW  39d
-GridY           DW  21d
+        food_phases dw 7 dup(?)
+        food_phase_num dw ?
+        food_phase_size db 7
+        food_stop_x dw ?
+        food_stop_y dw ?
+        food_temp_cx dw ?
+        food_temp_dx dw ?
+        food_imgW equ 9
+        food_imgH equ 9
+        ; pixels colors of the images
+        food_img DB 29, 4, 4, 4, 4, 4, 4, 4, 112, 29, 31, 4, 4, 4, 4, 4, 112, 112, 29, 31, 31, 4, 4, 4, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 44
+        DB 44, 44, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 40, 40, 40, 112, 112, 112, 29, 31, 40, 40, 40, 40, 40, 112, 112, 29, 4, 4, 4, 4, 4, 4, 4
+        DB 112
 
-sqrX            DW  9
-sqrY            DW  9
+        ;image phases for animation
+        ;phase 2
+        food_img2 DB 29, 4, 4, 4, 4, 4, 4, 4, 31, 29, 31, 4, 4, 4, 4, 4, 31, 31, 29, 31, 31, 4, 4, 4, 112, 31, 31, 29, 31, 31, 44, 44, 44, 112, 31, 31, 29, 31, 31, 44
+        DB 44, 44, 112, 31, 31, 29, 31, 31, 44, 44, 44, 112, 31, 31, 29, 31, 31, 40, 40, 40, 112, 31, 31, 29, 31, 40, 40, 40, 40, 40, 31, 31, 29, 4, 4, 4, 4, 4, 4, 4
+        DB 31
 
-; expand points by SnakeWidth in all 8 directions      
-SnakeWidth      DW  4                                                         
-SquareWidth     DW  ?
+        ;phase 3
+        food_img3 DB 29, 4, 4, 4, 4, 4, 4, 31, 31, 29, 31, 4, 4, 4, 4, 4, 31, 112, 29, 31, 31, 4, 4, 4, 31, 31, 112, 29, 31, 31, 44, 44, 44, 31, 31, 112, 29, 31, 31, 44
+        DB 44, 44, 31, 31, 112, 29, 31, 31, 44, 44, 44, 31, 31, 112, 29, 31, 31, 40, 40, 40, 31, 31, 112, 29, 31, 40, 40, 40, 40, 40, 31, 112, 29, 4, 4, 4, 4, 4, 4, 31
+        DB 31
 
-; num of points for Snake 1
-Sz1             DW  5d
-; 0 for left / 1 for up / 2 for right / 3 for down
-DirS1           DW  0
-; points  of snake (snakewidth*2 away from each other)
-S1X             DW  6400d dup(?)            
-S1Y             DW  6400d dup(?)
-; for growing
-IsSnake1Fed     DB  0
+        ;phase 4
+        food_img4 DB 29, 4, 4, 4, 4, 4, 4, 31, 112, 29, 31, 4, 4, 4, 4, 31, 112, 112, 29, 31, 31, 4, 4, 31, 31, 112, 112, 29, 31, 31, 44, 44, 31, 31, 112, 112, 29, 31, 31, 44
+        DB 44, 31, 31, 112, 112, 29, 31, 31, 44, 44, 31, 31, 112, 112, 29, 31, 31, 40, 40, 31, 31, 112, 112, 29, 31, 40, 40, 40, 40, 31, 112, 112, 29, 4, 4, 4, 4, 4, 4, 31
+        DB 112
+
+        ;phase 5
+        food_img5 DB 29, 4, 31, 31, 31, 31, 31, 4, 112, 29, 31, 4, 31, 31, 31, 4, 112, 112, 29, 31, 31, 4, 31, 4, 112, 112, 112, 29, 31, 31, 44, 31, 44, 112, 112, 112, 29, 31, 31, 44
+        DB 31, 44, 112, 112, 112, 29, 31, 31, 44, 31, 44, 112, 112, 112, 29, 31, 31, 40, 31, 40, 112, 112, 112, 29, 31, 40, 31, 31, 31, 40, 112, 112, 29, 4, 31, 31, 31, 31, 31, 4
+        DB 112
+
+        ;phase 6
+        food_img6 DB 29, 31, 31, 4, 4, 4, 4, 4, 112, 29, 31, 31, 31, 4, 4, 4, 112, 112, 29, 31, 31, 31, 4, 4, 112, 112, 112, 29, 31, 31, 31, 44, 44, 112, 112, 112, 29, 31, 31, 31
+        DB 44, 44, 112, 112, 112, 29, 31, 31, 31, 44, 44, 112, 112, 112, 29, 31, 31, 31, 40, 40, 112, 112, 112, 29, 31, 31, 31, 40, 40, 40, 112, 112, 29, 31, 31, 4, 4, 4, 4, 4
+        DB 112
+        ;phase 7
+        food_img7 DB 29, 4, 4, 4, 4, 4, 4, 4, 112, 29, 31, 4, 4, 4, 4, 4, 112, 112, 29, 31, 31, 4, 4, 4, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 44
+        DB 44, 44, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 40, 40, 40, 112, 112, 112, 29, 31, 40, 40, 40, 40, 40, 112, 112, 29, 4, 4, 4, 4, 4, 4, 4
+        DB 112
 
 
-; Snake 2
-Sz2             DW  5d
-DirS2           DW  2
-S2X             DW  6400d dup(?)
-S2Y             Dw  6400d dup(?)
-IsSnake2Fed     DB  0
 
-clrs1           equ     1100b
-clrs2           equ     1001b
 
-clr_BackGround  equ     1111b
 
-clr_top_border  equ     1111b
 
-clr_side_border  equ     1111b
+;
+;-------------------------------------------------------------------------------------------------
+;----------------------SNAKE STUFF----------------------------------
+;-------------------------------------------------------------------------------------------------
+        ScreenWidth     EQU  320d
+        ScrX            EQU  320d
+        ScreenHighet    EQU  200d
+        ScrY            EQU  200d
+
+        ; (inner grid w/o borders)     39*21 squares fit inside grid each square is 9*9 pixels
+        GridX           DW  39d
+        GridY           DW  21d
+
+        sqrX            DW  9
+        sqrY            DW  9
+
+        ; expand points by SnakeWidth in all 8 directions      
+        SnakeWidth      DW  4                                                         
+        SquareWidth     DW  ?
+
+        ; num of points for Snake 1
+        Sz1             DW  7d
+        ; 0 for left / 1 for up / 2 for right / 3 for down
+        DirS1           DW  0
+        ; points  of snake (snakewidth*2 away from each other)
+        S1X             DW  6400d dup(?)            
+        S1Y             DW  6400d dup(?)
+        ; for growing
+        IsSnake1Fed     DB  0
+
+
+        ; Snake 2
+        Sz2             DW  2d
+        DirS2           DW  2
+        S2X             DW  6400d dup(?)
+        S2Y             Dw  6400d dup(?)
+        IsSnake2Fed     DB  0
+
+        clrs1           equ     1100b
+        clrs2           equ     1001b
+
+        clr_BackGround  equ     1111b
+
+        clr_top_border  equ     1111b
+
+        clr_side_border  equ     1111b
 
 ;-------------------------------------------------------------------------------------------------
 ;----------------------CODE SEGMENT----------------------------------
@@ -59,6 +116,7 @@ clr_side_border  equ     1111b
 ;-------------------------------------------------
 drawSqr              PROC    FAR                             
 
+                        mov ah,0Ch
         ;-------------------------------------------------
                         push si
                         push di
@@ -92,8 +150,7 @@ drawSqr              PROC    FAR
                         jmp draw_sqr_inner
         draw_sqr_outerr:   
                         inc si
-                        cmp si,SquareWidth
-                        jnz draw_sqr_outer
+                        jmp draw_sqr_outer
 
         draw_sqr_eee:     
                         pop di
@@ -112,8 +169,9 @@ drawSqr              ENDP
 ;-------------------------------------------------
 ;----------------------DRAW RECT--------------
 ;-------------------------------------------------
-drawRect              PROC    FAR                             
+drawRect              PROC    FAR      
 
+                        mov ah,0Ch
         ;-------------------------------------------------
                         push si
                         push di
@@ -167,6 +225,127 @@ drawRect              PROC    FAR
                         RET
 drawRect              ENDP
 
+
+
+;-------------------------------------------------
+;----------------------RANDOM X Y IN CX DX--------------
+;-------------------------------------------------
+random_x_y      proc FAR
+        ;   MAKE AX ALL RANDOM
+        xor ax, ax
+        int 1ah			;get random value from the ticks of the clock cx:dx
+        mov bl, dl		;put the most changable byte of dx in bl
+        int 1ah			;call the same interrupt to get another value in dx
+        mov bh, dl		;put the most changable byte of dx in bl again
+        mov ax, bx		;mov the random value to reg ax from bx
+
+        ;   scaling the random value by number of squares (39 x 21) --  ([0-38] , [0-20])
+
+        ;   generating X from 0 to 38 and storing in SI
+        mov dx, 00h
+        mov bx, 37d 	        ;the width of the screen
+        mov cx,ax               ;storing random number
+        div bx			;mod the random value with the width to get a random number from 0 to 38
+        mov si, dx		;initialize reg si with the value
+
+        ;   get the random value for the y axis
+        mov ax, cx      ;getting random value back
+
+        ;   generating Y from 0 to 32 and storing in DI
+        mov dx, 00h
+        mov bx, 18d		;the height of the screen
+        div bx			;dx now has the value form 0 to 20
+        mov di,dx
+
+        ;       scaling SI and DI from sqrs number to actual X and Y locations in the grid
+        ;       x starts from 5+9 and ends in 313 (5+34*9)     0-5+9   1-5+2*9     
+    dummy_label_to_hide_func:    ;       y from 29+9 ---> 196(29+18*9)
+        mov cx,13d
+        inc si
+        rnd_x:
+        add cx,8d
+        dec si
+        jnz rnd_x
+
+        mov dx,44d
+        rnd_y:
+        add dx,8d
+        dec di
+        jnz rnd_y
+
+        dec cx
+
+                ret
+random_x_y      ENDP
+
+;-------------------------------------------------
+;----------------------DRAW FOOD--------------
+;-------------------------------------------------
+
+draw_food PROC FAR
+
+        mov food_phases, offset food_img
+        mov food_phases + 2, offset food_img2
+        mov food_phases + 4, offset food_img3
+        mov food_phases + 6, offset food_img4
+        mov food_phases + 8, offset food_img5
+        mov food_phases + 10, offset food_img6
+        mov food_phases + 12, offset food_img7
+
+	draw_food_init:
+                mov food_phase_size, 7
+                mov food_phase_num, offset food_phases
+                mov DI, food_phases             ; to iterate over the pixels
+                call random_x_y	                ;call function that return random numbers in cx and dx
+                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
+                mov food_stop_y, dx
+                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
+                mov food_temp_dx, dx	        ;store dx value to use it in animation
+                sub food_stop_x, food_imgW	;subtract the width of the image from cx so as to know where i will stop
+                sub food_stop_y, food_imgH
+        jmp draw_food_Start    	                        ;Avoid drawing before the calculations
+
+	draw_food_Drawit:
+                MOV AH,0Ch   	;set the configuration to writing a pixel
+                mov al, [DI]    ; color of the current coordinates
+                xor bx,bx   	;set the page number
+                INT 10h      	;execute the configuration
+        jmp draw_food_Start  
+
+	draw_food_Start: 
+                inc DI
+                DEC Cx       	        ;  loop iteration in x direction
+                cmp cx, food_stop_x
+        JNZ draw_food_Drawit      	        ;  check if we can draw current x and y and excape the y iteration
+                mov Cx, food_temp_cx 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+                DEC DX       	        ;  loop iteration in y direction
+                cmp dx, food_stop_y
+        JZ  draw_food_animate   	                ;  both x and y reached 00 so end program
+        Jmp draw_food_Drawit
+
+
+
+	draw_food_animate:
+                MOV CX, 00H		;cx:dx is used as a register of the time in microsec.
+                MOV DX, 02d40H
+                MOV AH, 86H	
+                INT 15H
+                
+                dec food_phase_size
+        jz draw_food_ENDING
+                mov bx, food_phase_num
+                add bx, 2
+                mov food_phase_num, bx
+                mov di, [bx]
+                mov cx, food_temp_cx
+                mov dx, food_temp_dx
+        jmp draw_food_Drawit
+
+	draw_food_ENDING:
+                        RET
+	draw_food       ENDP
+
+
 ;-------------------------------------------------
 ;----------------------DRAW ENVIRONMENT--------------
 ;-------------------------------------------------
@@ -185,17 +364,15 @@ drawEnv PROC     FAR
         
 
         ;draw horizontal line at top of screen
-        mov ax,1
-        mov SquareWidth,ax
+        mov SquareWidth,1
 
-        xor cx,cx
+        mov cx,1
         mov dx,27d
         mov ah,0Ch
         mov al,clr_top_border
 drawEnv_top_line:               
-       CALL drawSqr
+        CALL drawSqr
         inc cx
-        ; inc cx
         cmp cx,319d
         jl drawEnv_top_line
 
@@ -206,7 +383,7 @@ drawEnv_top_line:
 
         mov cx,1
         mov dx,ScrY
-        sub dx,2
+        sub dx,2                ; 198d
         mov ah,0Ch
         mov al,clr_top_border
 drawEnv_btm_line:               
@@ -218,7 +395,7 @@ drawEnv_btm_line:
 
 
         ;draw left side line of screen
-        mov ax,3
+        mov ax,2
         mov SquareWidth,ax
 
         xor dx,dx
@@ -234,12 +411,12 @@ drawEnv_lft_line:
         jl drawEnv_lft_line
 
         ;draw right side line of screen
-        mov ax,3
+        mov ax,2
         mov SquareWidth,ax
 
         xor dx,dx
         mov cx,ScrX
-        sub cx,3
+        sub cx,3                        ; 197d
         mov ah,0Ch
         mov al,clr_side_border
 drawEnv_rght_line:               
@@ -610,14 +787,21 @@ MAIN    PROC FAR
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
         ; CALL feedsnake
-        mov cx,0FFFFh                             ;For Frame Wait
+
+        ; delay function
+        MOV CX, 1eH		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 8480H
+        MOV AH, 86H	
+        ; INT 15H			;delay interrupt int 15h / ah = 86h
+
+        ; For Frame Wait
+        mov cx,0FFFFh                         
         WER1:    LOOP WER1
+
         mov ah,01
         int 16h
         JZ FFF1
         
-
-
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
 
@@ -628,114 +812,127 @@ L1:
         je L1
         mov DirS1 , 1      
         jmp FF1                                  ;AH = BIOS scan code.
-Left:     cmp ah,4Bh                              ;AL = ASCII character. 
-        jnz Right
-        cmp DirS1,2
-        je L1
-        mov DirS1 , 0
-        jmp FF1
+        Left:     cmp ah,4Bh                              ;AL = ASCII character. 
+                jnz Right
+                cmp DirS1,2
+                je L1
+                mov DirS1 , 0
+                jmp FF1
 
-Right:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
-        jnz Down
-        cmp DirS1,0
-        je L1                                  ;Up: 0x48
-        mov DirS1 , 2                          ;Left: 0x4B
-        jmp FF1                                  ;Right: 0x4D
-                                                ;Down: 0x50
-Down:   
-        cmp ah,50h
-        jnz UP2
-        cmp DirS1,1
-        je L1  
-        mov DirS1 , 3   
-        jmp FF1
-UP2:   
-        cmp al,77h                              ;AL = ASCII character. 
-        jnz Left2
-        cmp DirS2,3
-        je L1  
-        mov DirS2 , 1
-        jmp FF1
-FFF1:jmp FF1
-
-
-Left2:  
-        cmp al,61h                              ;And the scan codes for the arrow keys are:
-        jnz Right2                                  ;Up: 0x48
-        cmp DirS2,2
-        je LL1 
-        mov DirS2 , 0                           ;Left: 0x4B
-        jmp FF1                                  ;Right: 0x4D
-
-LL1: jmp L1
-                                                ;Down: 0x50
-Right2:
-        cmp al,64h
-        jnz Down2 
-        cmp DirS2,0
-        je LL1  
-        mov DirS2 , 2   
-        jmp FF1
-
-Down2:  
-        cmp al,73h
-        jnz UpC2
-        cmp DirS2,1
-        je LL1  
-        mov DirS2 , 3   
-        jmp FF1
-;FOR CAPITAL LETTERS
-UPC2:    
-        cmp al,57h                              ;AL = ASCII character. 
-        jnz LeftC2
-        cmp DirS2,3
-        je LL1  
-        mov DirS2 , 1
-        jmp FF1
-
-LeftC2:   
-        cmp al,41h                              ;And the scan codes for the arrow keys are:
-        jnz RightC2                                  ;Up: 0x48
-        cmp DirS2,2
-        je LL1  
-        mov DirS2 , 0                           ;Left: 0x4B
-        jmp FF1                                 ;Right: 0x4D
-                                                ;Down: 0x50
-RightC2:     
-        cmp al,44h
-        jnz DownC2 
-        cmp DirS2,0
-        je LL1  
-        mov DirS2 , 2   
-        jmp FF1
-
-DownC2:     
-        cmp al,53h
-        jnz LL1  
-        cmp DirS2,1
-        je LL1  
-        mov DirS2 , 3   
-        jmp FF1
+        Right:     cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
+                jnz Down
+                cmp DirS1,0
+                je L1                                  ;Up: 0x48
+                mov DirS1 , 2                          ;Left: 0x4B
+                jmp FF1                                  ;Right: 0x4D
+                                                        ;Down: 0x50
+        Down:   
+                cmp ah,50h
+                jnz UP2
+                cmp DirS1,1
+                je L1  
+                mov DirS1 , 3   
+                jmp FF1
+        UP2:   
+                cmp al,77h                              ;AL = ASCII character. 
+                jnz Left2
+                cmp DirS2,3
+                je L1  
+                mov DirS2 , 1
+                jmp FF1
+        FFF1:jmp FF1
 
 
-jmp L1        
+        Left2:  
+                cmp al,61h                              ;And the scan codes for the arrow keys are:
+                jnz Right2                                  ;Up: 0x48
+                cmp DirS2,2
+                je LL1 
+                mov DirS2 , 0                           ;Left: 0x4B
+                jmp FF1                                  ;Right: 0x4D
+
+        LL1: jmp L1
+                                                        ;Down: 0x50
+        Right2:
+                cmp al,64h
+                jnz Down2 
+                cmp DirS2,0
+                je LL1  
+                mov DirS2 , 2   
+                jmp FF1
+
+        Down2:  
+                cmp al,73h
+                jnz UpC2
+                cmp DirS2,1
+                je LL1  
+                mov DirS2 , 3   
+                jmp FF1
+        ;FOR CAPITAL LETTERS
+        UPC2:    
+                cmp al,57h                              ;AL = ASCII character. 
+                jnz LeftC2
+                cmp DirS2,3
+                je LL1  
+                mov DirS2 , 1
+                jmp FF1
+
+        LeftC2:   
+                cmp al,41h                              ;And the scan codes for the arrow keys are:
+                jnz RightC2                                  ;Up: 0x48
+                cmp DirS2,2
+                je LL1  
+                mov DirS2 , 0                           ;Left: 0x4B
+                jmp FF1                                 ;Right: 0x4D
+                                                        ;Down: 0x50
+        RightC2:     
+                cmp al,44h
+                jnz DownC2 
+                cmp DirS2,0
+                je LL1  
+                mov DirS2 , 2   
+                jmp FF1
+
+        DownC2:     
+                cmp al,53h
+                jnz LL1  
+                cmp DirS2,1
+                je LL1  
+                mov DirS2 , 3   
+                jmp FF1
+
+
+jmp L1  
+
 FF1:
-        mov cx,0FFFFh                             ;For Frame Wait
-WER:    LOOP WER
-        mov cx,0FFFFh                             ;For Frame Wait
-WER2:    LOOP WER2
-        mov cx,0FFFFh                             ;For Frame Wait
-WER3:   LOOP WER3
-        mov cx,0FFFFh                             ;For Frame Wait
-WER4:   LOOP WER4
-        mov cx,0FFFFh                             ;For Frame Wait
-WER5:   LOOP WER5
-        mov cx,0FFFFh                             ;For Frame Wait
-WER6:   LOOP WER6
+        ; delay function
+        MOV CX, 1eH		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 8480H
+        MOV AH, 86H	
+        ; INT 15H			;delay interrupt int 15h / ah = 86h
       
 
+        CALL  draw_food
         CALL  advancesnakes
 jmp L1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	click:
+        ; delay function
+        MOV CX, 00H		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 1880H
+        MOV AH, 86H	
+        INT 15H			;delay interrupt int 15h / ah = 86h
+
+
+        ;       DELETING FOOD
+        mov SquareWidth,4
+        xor al,al
+        mov cx,food_temp_cx
+        mov dx,food_temp_dx
+        sub cx,4
+        sub dx,4
+        ; call drawSqr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         mov ah,4ch

@@ -55,9 +55,16 @@
         DB 44, 44, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 40, 40, 40, 112, 112, 112, 29, 31, 40, 40, 40, 40, 40, 112, 112, 29, 4, 4, 4, 4, 4, 4, 4
         DB 112
 
+;-------------------------------------------------------------------------------------------------
+;----------------------PowerUPs STUFF----------------------------------
+;-------------------------------------------------------------------------------------------------
 
-
-
+        Num_Of_Times db 0
+        Freeze_S1 dw 0
+        Freeze_S2 dw 0
+        Poison_S1 dw 0
+        Poison_S2 dw 0
+        poison_active dw 0        
 
 
 ;
@@ -893,51 +900,108 @@ L1:
 
         mov ah,01
         int 16h
-        JZ FFF1
+        JZ FFFF1
         
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
-
+        instantKill:
+        instantDeath:
+        Poison:
+        cmp poison_active,0
+        Je Freeze
+        mov Num_Of_Times,1
+        Freeze:
+        
    
         UP:    
         cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz Left
         cmp DirS1,3
-        je FFF1
+        je FFFF1
+        cmp Poison_S1,1
+        je UP_Poison
         mov DirS1 , 1      
         jmp FF1   
-                                                ;AH = BIOS scan code.
+        UP_Poison:
+        mov DirS1,3
+        dec [Num_Of_Times]
+        cmp Num_Of_Times,0
+        je STOP_Poison
+        jmp FF1
+
         Left:
         cmp ah,4Bh                              ;AL = ASCII character. 
         jnz Right
         cmp DirS1,2
-        je FFF1
+        je FFFF1
+        cmp Poison_S1,1
+        je Left_Poison
         mov DirS1 , 0
         jmp FF1
-
+        Left_Poison:
+        mov DirS1,2
+        dec [Num_Of_Times]
+        cmp Num_Of_Times,0
+        je STOP_Poison
+        jmp FF1
+        
+        FFFF1:jmp FF1
+        STOP_Poison:                                 ;stoping poison
+        mov poison_active,0
+        mov Poison_S1,0
+        jmp FF1
+       
+       
         Right:    
         cmp ah,4Dh                              ;And the scan codes for the arrow keys are:
         jnz Down
         cmp DirS1,0
-        je FFF1                                  ;Up: 0x48
+        je FFFF1                                  ;Up: 0x48
+        cmp Poison_S1,1
+        je Right_Poison
         mov DirS1 , 2                          ;Left: 0x4B
         jmp FF1                                  ;Right: 0x4D
-                                                        ;Down: 0x50
+        Right_Poison:
+        mov DirS1,0
+        dec [Num_Of_Times]
+        cmp Num_Of_Times,0
+        je STOP_Poison
+        jmp FF1
+                                                ;Down: 0x50
         Down:   
         cmp ah,50h
         jnz UP2
         cmp DirS1,1
         je FFF1  
+        cmp Poison_S1,1
+        je Down_Poison
         mov DirS1 , 3   
         jmp FF1
-
+        Down_Poison:
+        mov DirS1,1
+        dec [Num_Of_Times]
+        cmp Num_Of_Times,0
+        je STOP_Poison
+        jmp FF1
+        
+        
+        
         UP2:   
         cmp al,77h                              ;AL = ASCII character. 
         jnz Left2
         cmp DirS2,3
         je FFF1  
+        cmp Poison_S2,1
+        je UP2_Poison
         mov DirS2 , 1
         jmp FF1
+        UP2_Poison:
+        mov DirS2,3
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP2_Poison
+        jmp FFF1
+
         FFF1:jmp FF1
 
 
@@ -946,9 +1010,22 @@ L1:
         jnz Right2                                  ;Up: 0x48
         cmp DirS2,2
         je FFF1 
+        cmp Poison_S2,1
+        je Left2_Poison
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF1                                  ;Right: 0x4D
+        Left2_Poison:
+        mov DirS2,2
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP2_Poison
+        jmp FFF1
 
+        STOP2_Poison:                                 ;stoping poison
+        mov poison_active,0
+        mov Poison_S2,0
+        jmp FF1
+       
         LL1: jmp L1
                                                         ;Down: 0x50
         Right2:
@@ -956,7 +1033,15 @@ L1:
         jnz Down2 
         cmp DirS2,0
         je FFF1  
+        cmp Poison_S2,1
+        je Right2_Poison
         mov DirS2 , 2   
+        jmp FF1
+        Right2_Poison:
+        mov DirS2,0
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP2_Poison
         jmp FF1
 
         Down2:  
@@ -964,31 +1049,71 @@ L1:
         jnz UpC2
         cmp DirS2,1
         je FFF1  
+        cmp Poison_S2,1
+        je Down2_Poison
         mov DirS2 , 3   
         jmp FF1
+        Down2_Poison:
+        mov DirS2,1
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP2_Poison
+        jmp FF1
         ;FOR CAPITAL LETTERS
+                FFFFF1:jmp FF1
+
         UPC2:    
         cmp al,57h                              ;AL = ASCII character. 
         jnz LeftC2
         cmp DirS2,3
-        je FFF1  
+        je FFFFF1  
+        cmp Poison_S2,1
+        je UPC2_Poison
         mov DirS2 , 1
+        jmp FF1
+        UPC2_Poison:
+        mov DirS2,3
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP3_Poison
         jmp FF1
 
         LeftC2:   
         cmp al,41h                              ;And the scan codes for the arrow keys are:
         jnz RightC2                                  ;Up: 0x48
         cmp DirS2,2
-        je FFF1  
+        je FFFFF1  
+        cmp Poison_S2,1
+        je LeftC2_Poison
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF1                                 ;Right: 0x4D
-                                                        ;Down: 0x50
+        LeftC2_Poison:
+        mov DirS2,2
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP3_Poison
+        jmp FF1
+                                              ;Down: 0x50
+        STOP3_Poison:                                 ;stoping poison
+        mov poison_active,0
+        mov Poison_S2,0
+        jmp FF1
+       
+        
         RightC2:     
         cmp al,44h
         jnz DownC2 
         cmp DirS2,0
-        je FFF1  
+        je FF1  
+        cmp Poison_S2,1
+        je RightC2_Poison
         mov DirS2 , 2   
+        jmp FF1
+        RightC2_Poison:
+        mov DirS1,0
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP3_Poison
         jmp FF1
 
         DownC2:     
@@ -996,7 +1121,15 @@ L1:
         jnz FF1  
         cmp DirS2,1
         je FF1  
+        cmp Poison_S2,1
+        je DownC2_Poison
         mov DirS2 , 3   
+        jmp FF1
+        DownC2_Poison:
+        mov DirS1,1
+        dec Num_Of_Times
+        cmp Num_Of_Times,0
+        je STOP3_Poison
         jmp FF1
 
 

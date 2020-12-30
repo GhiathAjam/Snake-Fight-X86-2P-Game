@@ -561,6 +561,9 @@ INIT                   ENDP
 ;-------------------------------------------------
 feedsnake               PROC    FAR                             ; Snake num  as parameter in AX
 
+        mov poison_active,1
+        mov Poison_S1,1
+
         cmp ax,1
         jnz feed_s2
         mov cx,S1HX
@@ -900,7 +903,7 @@ L1:
 
         mov ah,01
         int 16h
-        JZ FFFF1
+        JZ FFFFFF1
         
         mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
         int 16h                                 ;return:
@@ -911,6 +914,7 @@ L1:
         Je Freeze
         mov Num_Of_Times,3
         mov poison_active,0
+        
         Freeze:
         
    
@@ -924,12 +928,16 @@ L1:
         mov DirS1 , 1      
         jmp FF1   
         UP_Poison:
+        cmp DirS1 , 1      
+        je FFFF1   
         mov DirS1,3
         dec [Num_Of_Times]
         cmp Num_Of_Times,0
         je STOP_Poison
         jmp FF1
-
+  
+         FFFFFF1:jmp FF1
+      
         Left:
         cmp ah,4Bh                              ;AL = ASCII character. 
         jnz Right
@@ -940,6 +948,8 @@ L1:
         mov DirS1 , 0
         jmp FF1
         Left_Poison:
+        cmp DirS1 , 0      
+        je FFFF1   
         mov DirS1,2
         dec [Num_Of_Times]
         cmp Num_Of_Times,0
@@ -963,6 +973,8 @@ L1:
         mov DirS1 , 2                          ;Left: 0x4B
         jmp FF1                                  ;Right: 0x4D
         Right_Poison:
+        cmp DirS1 , 2      
+        je FFFF1   
         mov DirS1,0
         dec [Num_Of_Times]
         cmp Num_Of_Times,0
@@ -979,6 +991,8 @@ L1:
         mov DirS1 , 3   
         jmp FF1
         Down_Poison:
+        cmp DirS1 , 3      
+        je FFFF1   
         mov DirS1,1
         dec [Num_Of_Times]
         cmp Num_Of_Times,0
@@ -997,6 +1011,8 @@ L1:
         mov DirS2 , 1
         jmp FF1
         UP2_Poison:
+        cmp DirS2 , 1      
+        je FFF1   
         mov DirS2,3
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1016,6 +1032,8 @@ L1:
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF1                                  ;Right: 0x4D
         Left2_Poison:
+        cmp DirS2 , 0      
+        je FFF1   
         mov DirS2,2
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1039,6 +1057,8 @@ L1:
         mov DirS2 , 2   
         jmp FF1
         Right2_Poison:
+        cmp DirS2 , 2      
+        je FFF1   
         mov DirS2,0
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1049,12 +1069,14 @@ L1:
         cmp al,73h
         jnz UpC2
         cmp DirS2,1
-        je FFF1  
+        je FFFFF1  
         cmp Poison_S2,1
         je Down2_Poison
         mov DirS2 , 3   
         jmp FF1
         Down2_Poison:
+        cmp DirS2 , 3      
+        je FFFFF1   
         mov DirS2,1
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1073,6 +1095,8 @@ L1:
         mov DirS2 , 1
         jmp FF1
         UPC2_Poison:
+        cmp DirS2 , 1      
+        je FFFFF1   
         mov DirS2,3
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1089,6 +1113,8 @@ L1:
         mov DirS2 , 0                           ;Left: 0x4B
         jmp FF1                                 ;Right: 0x4D
         LeftC2_Poison:
+        cmp DirS2 , 0      
+        je FFFFF1   
         mov DirS2,2
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1111,6 +1137,8 @@ L1:
         mov DirS2 , 2   
         jmp FF1
         RightC2_Poison:
+        cmp DirS2 , 2      
+        je FF1   
         mov DirS1,0
         dec Num_Of_Times
         cmp Num_Of_Times,0
@@ -1127,6 +1155,8 @@ L1:
         mov DirS2 , 3   
         jmp FF1
         DownC2_Poison:
+        cmp DirS2 , 3      
+        je FF1   
         mov DirS1,1
         dec Num_Of_Times
         cmp Num_Of_Times,0

@@ -909,7 +909,8 @@ L1:
         Poison:
         cmp poison_active,0
         Je Freeze
-        mov Num_Of_Times,1
+        mov Num_Of_Times,3
+        mov poison_active,0
         Freeze:
         
    

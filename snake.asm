@@ -561,8 +561,8 @@ INIT                   ENDP
 ;-------------------------------------------------
 feedsnake               PROC    FAR                             ; Snake num  as parameter in AX
 
-        mov poison_active,1
-        mov Poison_S1,1
+       ; mov poison_active,1
+       ; mov Poison_S1,1
 
         cmp ax,1
         jnz feed_s2

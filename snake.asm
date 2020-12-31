@@ -465,8 +465,6 @@ drawEnv_rght_line:
         jl drawEnv_rght_line
 
 
-        CALL  draw_food
-
         ; DRAWING OBSTACLES
         ; Drawing Square
         mov SquareWidth,15d
@@ -482,11 +480,11 @@ drawEnv_rght_line:
         mov dx,56d
         mov bx,8
 
-        obstacle_T:
+        obstacle_1:
         call drawSqr
         add cx,8
         dec bx
-        jnz obstacle_T
+        jnz obstacle_1
 
         ; Drawing lower Rectangle
         mov SquareWidth,3d
@@ -495,11 +493,11 @@ drawEnv_rght_line:
         mov dx,168d
         mov bx,8
 
-        obstacle_T2:
+        obstacle_2:
         call drawSqr
         add cx,8
         dec bx
-        jnz obstacle_T2
+        jnz obstacle_2
 
         ; Drawing Short Rotated Left T
         mov SquareWidth,3d
@@ -508,19 +506,19 @@ drawEnv_rght_line:
         mov dx,88d
         mov bx,7
 
-        obstacle_st:
+        obstacle_3:
         call drawSqr
         add dx,8
         dec bx
-        jnz obstacle_st
+        jnz obstacle_3
 
         sub dx,32d
         mov bx,4
-        obstacle_st2:
+        obstacle_31:
         call drawSqr
         add cx,8
         dec bx
-        jnz obstacle_st2
+        jnz obstacle_31
 
         ; Drawing Short Rotated Right T
         mov SquareWidth,3d
@@ -529,19 +527,106 @@ drawEnv_rght_line:
         mov dx,88d
         mov bx,7
 
-        obstacle_str:
+        obstacle_41:
         call drawSqr
         add dx,8
         dec bx
-        jnz obstacle_str
+        jnz obstacle_41
 
         sub dx,32d
         mov bx,4
-        obstacle_str2:
+        obstacle_42:
         call drawSqr
         sub cx,8
         dec bx
-        jnz obstacle_str2
+        jnz obstacle_42
+
+        ; Drawing upper left corner
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,16d
+        mov dx,40d
+        mov bx,3
+
+        obstacle_5:
+        call drawSqr
+        add dx,8
+        dec bx
+        jnz obstacle_5
+
+        sub dx,24d
+        mov bx,3
+        obstacle_52:
+        call drawSqr
+        add cx,8
+        dec bx
+        jnz obstacle_52
+
+        ; Drawing upper right corner
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,304d
+        mov dx,40d
+        mov bx,3
+
+        obstacle_6:
+        call drawSqr
+        add dx,8
+        dec bx
+        jnz obstacle_6
+
+        sub dx,24d
+        mov bx,3
+        obstacle_62:
+        call drawSqr
+        sub cx,8
+        dec bx
+        jnz obstacle_62
+
+        ; Drawing lower right corner
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,304d
+        mov dx,184d
+        mov bx,3
+
+        obstacle_7:
+        call drawSqr
+        sub dx,8
+        dec bx
+        jnz obstacle_7
+
+        add dx,24d
+        mov bx,3
+        obstacle_72:
+        call drawSqr
+        sub cx,8
+        dec bx
+        jnz obstacle_72
+
+        ; Drawing lower left corner
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,16d
+        mov dx,184d
+        mov bx,3
+
+        obstacle_8:
+        call drawSqr
+        sub dx,8
+        dec bx
+        jnz obstacle_8
+
+        add dx,24d
+        mov bx,3
+        obstacle_82:
+        call drawSqr
+        add cx,8
+        dec bx
+        jnz obstacle_82
+
+
+        CALL  draw_food
 
 ;
 ;INT 10h / AH = 0Ch - change color for a single pixel.

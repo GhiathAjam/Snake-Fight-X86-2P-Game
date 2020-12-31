@@ -299,7 +299,13 @@ random_x_y      proc FAR
         mov ah,0Dh
         int 10h                 ;AL = pixel color
         and al,al
-        jz rand_eee          ; SQuare not availible
+        jz rand_eee          ; SQuare  availible
+        add cx,2
+        add dx,2
+        mov ah,0Dh
+        int 10h                 ;AL = pixel color
+        and al,al
+        jz rand_eee          ; SQuare  availible
         jmp rand_Again
 
         rand_eee:
@@ -460,6 +466,83 @@ drawEnv_rght_line:
 
 
         CALL  draw_food
+
+        ; DRAWING OBSTACLES
+        ; Drawing Square
+        mov SquareWidth,15d
+        mov al,07h                             
+        mov cx,92d
+        mov dx,313d
+        call drawSqr
+
+        ; Drawing Rectangle
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,128d
+        mov dx,56d
+        mov bx,8
+
+        obstacle_T:
+        call drawSqr
+        add cx,8
+        dec bx
+        jnz obstacle_T
+
+        ; Drawing lower Rectangle
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,128d
+        mov dx,168d
+        mov bx,8
+
+        obstacle_T2:
+        call drawSqr
+        add cx,8
+        dec bx
+        jnz obstacle_T2
+
+        ; Drawing Short Rotated Left T
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,48d
+        mov dx,88d
+        mov bx,7
+
+        obstacle_st:
+        call drawSqr
+        add dx,8
+        dec bx
+        jnz obstacle_st
+
+        sub dx,32d
+        mov bx,4
+        obstacle_st2:
+        call drawSqr
+        add cx,8
+        dec bx
+        jnz obstacle_st2
+
+        ; Drawing Short Rotated Right T
+        mov SquareWidth,3d
+        mov al,07h
+        mov cx,272d
+        mov dx,88d
+        mov bx,7
+
+        obstacle_str:
+        call drawSqr
+        add dx,8
+        dec bx
+        jnz obstacle_str
+
+        sub dx,32d
+        mov bx,4
+        obstacle_str2:
+        call drawSqr
+        sub cx,8
+        dec bx
+        jnz obstacle_str2
+
 ;
 ;INT 10h / AH = 0Ch - change color for a single pixel.
 ;input:
@@ -679,7 +762,11 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
                 jnz advance_not_other
                 jmp advance_snake2
                 NOP
-        advance_not_other:       
+        advance_not_other:
+                cmp al,07h
+                jnz advance_not_obstacle
+                jmp advance_snake2
+        advance_not_obstacle:              
         advance_safe:
 
 
@@ -821,7 +908,13 @@ advance_snake2:
         jnz advance2_not_other
         jmp advance_end
 
-        advance2_not_other:       
+        advance2_not_other:
+        cmp al,07h
+        jnz advance2_not_obstacle
+        jmp advance_end
+
+        advance2_not_obstacle:              
+       
         advance2_safe:
 ;       Shifting SNAKE 2
  
@@ -914,8 +1007,8 @@ L1:
         ; CALL feedsnake
 
         ; delay function
-        MOV CX, 0H		;cx:dx is used as a register of the time in microsec.
-        MOV DX, 8480H
+        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 1480H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
 
@@ -1192,7 +1285,7 @@ FF1:
         MOV AH, 86H	
         ; INT 15H			;delay interrupt int 15h / ah = 86h
       
-
+        ; CALL draw_food
         CALL  advancesnakes
 jmp L1
 

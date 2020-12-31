@@ -242,6 +242,8 @@ drawRect              ENDP
 ;----------------------RANDOM X Y IN CX DX--------------
 ;-------------------------------------------------
 random_x_y      proc FAR
+        
+        rand_Again:
         ;   MAKE AX ALL RANDOM
         xor ax, ax
         int 1ah			;get random value from the ticks of the clock cx:dx
@@ -286,6 +288,23 @@ random_x_y      proc FAR
         jnz rnd_y
 
         dec cx
+
+
+        ;       get color of pixel 
+        mov si,Cx
+        mov di,dx       ; backup
+
+        sub cx,4
+        sub dx,4
+        mov ah,0Dh
+        int 10h                 ;AL = pixel color
+        and al,al
+        jz rand_eee          ; SQuare not availible
+        jmp rand_Again
+
+        rand_eee:
+        mov cx,si
+        mov dx,di
 
                 ret
 random_x_y      ENDP
@@ -895,7 +914,7 @@ L1:
         ; CALL feedsnake
 
         ; delay function
-        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
+        MOV CX, 0H		;cx:dx is used as a register of the time in microsec.
         MOV DX, 8480H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h

@@ -8,8 +8,10 @@
         .DATA
 
 ;-------------------------------------------------------------------------------------------------
-;----------------------FOOD STUFF----------------------------------
+;----------------------IMAGEs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
+
+;// FOOD 
 
         food_phases dw 7 dup(?)
         food_phase_num dw ?
@@ -55,6 +57,39 @@
         DB 44, 44, 112, 112, 112, 29, 31, 31, 44, 44, 44, 112, 112, 112, 29, 31, 31, 40, 40, 40, 112, 112, 112, 29, 31, 40, 40, 40, 40, 40, 112, 112, 29, 4, 4, 4, 4, 4, 4, 4
         DB 112
 
+;// SNAKE 1
+ Img_S1_H_D DB 40, 40, 40, 40, 40, 40, 40, 40, 31, 16, 40, 16, 31, 40, 40, 31, 31, 40, 31, 31, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40 
+ DB 40, 40, 40, 40, 40, 40, 40, 40, 40
+
+ Img_S1_H_L DB 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 31, 31, 40, 40, 40, 40, 40, 31, 16, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 31, 16, 40, 40, 40, 40, 40, 31 
+ DB 31, 40, 40, 40, 40, 40, 40, 40, 40
+
+ Img_S1_H_R DB 40, 40, 40, 40, 40, 40, 40, 40, 31, 31, 40, 40, 40, 40, 40, 16, 31, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 16, 31, 40, 40, 40, 40, 40, 31, 31, 40, 40 
+ DB 40, 40, 40, 40, 40, 40, 40, 40, 40
+
+ Img_S1_H_U DB 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 31, 31, 40, 31, 31, 40, 40, 31, 16, 40, 16 
+ DB 31, 40, 40, 40, 40, 40, 40, 40, 40
+
+ Img_S1_B DB 40, 40, 31, 40, 31, 40, 40, 40, 31, 31, 31, 31, 31, 40, 31, 31, 40, 31, 40, 31, 31, 40, 31, 31, 40, 31, 31, 40, 31, 31, 40, 31, 40, 31, 31, 40, 31, 31, 31, 31 
+ DB 31, 40, 40, 40, 31, 40, 31, 40, 40
+
+;// SNAKE 2
+ Img_S2_H_D DB 53, 53, 53, 53, 53, 53, 53, 53, 31, 16, 53, 16, 31, 53, 53, 31, 31, 53, 31, 31, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53 
+ DB 53, 53, 53, 53, 53, 53, 53, 53, 53
+
+ Img_S2_H_L DB 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 31, 31, 53, 53, 53, 53, 53, 31, 16, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 31, 16, 53, 53, 53, 53, 53, 31 
+ DB 31, 53, 53, 53, 53, 53, 53, 53, 53
+
+ Img_S2_H_R DB 53, 53, 53, 53, 53, 53, 53, 53, 31, 31, 53, 53, 53, 53, 53, 16, 31, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 16, 31, 53, 53, 53, 53, 53, 31, 31, 53, 53 
+ DB 53, 53, 53, 53, 53, 53, 53, 53, 53
+
+ Img_S2_H_U DB 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 31, 31, 53, 31, 31, 53, 53, 31, 16, 53, 16 
+ DB 31, 53, 53, 53, 53, 53, 53, 53, 53
+
+ Img_S2_B   DB 53, 53, 31, 53, 31, 53, 53, 53, 31, 31, 31, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 31, 31 
+ DB 31, 53, 53, 53, 31, 53, 31, 53, 53
+
+
 ;-------------------------------------------------------------------------------------------------
 ;----------------------PowerUPs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
@@ -91,7 +126,7 @@
         SquareWidth     DW  ?
 
         ; num of points for Snake 1
-        Sz1             DW  3d
+        Sz1             DW  5d
         ; 0 for left / 1 for up / 2 for right / 3 for down
         DirS1           DW  0
         ; points  of snake (snakewidth*2 away from each other)
@@ -104,7 +139,7 @@
         S1HY            DW ?
 
         ; Snake 2
-        Sz2             DW  3d
+        Sz2             DW  5d
         DirS2           DW  2
         S2X             DW  6400d dup(?)
         S2Y             Dw  6400d dup(?)
@@ -385,6 +420,53 @@ draw_food PROC FAR
                         RET
 	draw_food       ENDP
 
+;-------------------------------------------------
+;----------------------DRAW IMAGE --------------
+;-------------------------------------------------
+
+Draw_Image PROC FAR                                ; cx is x - dx is y - di is image offset - 
+
+        push bx
+        push cx
+        push dx
+
+        add cx,3d
+        add dx,3d
+
+	Draw_Image_init:
+                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
+                mov food_stop_y, dx
+                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
+                mov food_temp_dx, dx	        ;store dx value to use it in animation
+                sub food_stop_x, 7	        ;subtract the width of the image from cx so as to know where i will stop
+                sub food_stop_y, 7
+                dec di
+                inc cx
+
+	Draw_Image_Start: 
+                inc DI
+                DEC Cx       	                ;  loop iteration in x direction
+                cmp cx, food_stop_x
+        JNZ Draw_Image_Drawit      	;  check if we can draw current x and y and excape the y iteration
+                mov Cx, food_temp_cx 	        ;  if loop iteration in y direction, then x should start over so that we sweep the grid
+                DEC DX       	                ;  loop iteration in y direction
+                cmp dx, food_stop_y
+        JZ  Draw_Image_eee   	        ;  both x and y reached 00 so end program
+
+	Draw_Image_Drawit:
+                MOV AH,0Ch   	;set the configuration to writing a pixel
+                mov al, [DI]    ; color of the current coordinates
+                xor bx,bx   	;set the page number
+                INT 10h      	;execute the configuration
+        jmp Draw_Image_Start  
+
+
+        Draw_Image_eee:
+        pop dx
+        pop cx
+        pop bx
+                                RET
+	Draw_Image         ENDP
 
 ;-------------------------------------------------
 ;----------------------DRAW ENVIRONMENT--------------
@@ -407,7 +489,7 @@ drawEnv PROC     FAR
         mov SquareWidth,2
 
         mov cx,1
-        mov dx,26d
+        mov dx,25d
        
         mov al,clr_top_border
 drawEnv_top_line:               
@@ -423,7 +505,7 @@ drawEnv_top_line:
 
         mov cx,1
         mov dx,ScrY
-        sub dx,2                ; 198d
+        sub dx,1                ; 198d
        
         mov al,clr_top_border
 drawEnv_btm_line:               
@@ -439,7 +521,7 @@ drawEnv_btm_line:
         mov SquareWidth,ax
 
         xor dx,dx
-        mov cx,2
+        mov cx,1
        
         mov al,clr_side_border
 drawEnv_lft_line:               
@@ -456,7 +538,7 @@ drawEnv_lft_line:
 
         xor dx,dx
         mov cx,ScrX
-        sub cx,3                        ; 197d
+        sub cx,2                        ; 197d
        
         mov al,clr_side_border
 drawEnv_rght_line:               
@@ -679,21 +761,27 @@ init_L1:
         LOOP init_L1
 
         ; drawing snake1        //al = color ,          SquareWidth ,   CX=X    DX=Y
-       
-        mov al,clrs1
-        mov cx,SnakeWidth
-        mov SquareWidth,cx
+        mov cx,[s1x]
+        mov dx,[s1y]
+        mov di,offset Img_S1_H_L
+        CALL Draw_Image
+      
         lea SI,S1X
         lea Di,S1Y
-        mov Bx,Sz1
-
+        add si,2
+        add di,2
+        mov Bp,Sz1
+        dec Bp
 init_draws1:
                 mov cx,[si]
                 mov dx,[di]
-                CALL drawRect
+                push di
+                mov di,offset Img_S1_B
+                call Draw_Image
+                pop di
                 add si,2
                 add di,2
-                dec BX
+                dec Bp
                 jnz init_draws1
 
 
@@ -728,21 +816,28 @@ init_L2:
         LOOP init_L2
 
         ; drawing snake2        //al = color ,          SquareWidth ,   CX=X    DX=Y
-       
-        mov al,clrs2
-        mov cx,SnakeWidth
-        mov SquareWidth,cx
+        mov cx,[s2x]
+        mov dx,[s2y]
+        mov di,offset Img_S2_H_R
+        CALL Draw_Image
+      
+      
         lea SI,S2X
         lea Di,S2Y
-        mov Bx,Sz2
-
+        add si,2
+        add di,2
+        mov Bp,Sz1
+        dec Bp
 init_draws2:
                 mov cx,[si]
                 mov dx,[di]
-                CALL drawRect
+                push di
+                mov di,offset Img_S2_B
+                call Draw_Image
+                pop di
                 add si,2
                 add di,2
-                dec BX
+                dec Bp
                 jnz init_draws2
                 ret
 INIT                   ENDP
@@ -836,7 +931,7 @@ snake1head:
                 cmp al,02Ch
                 jnz advance_not_food
 
-                mov Freeze_active,1
+                ;mov Freeze_active,1
 
                 mov ax,1
                 CALL feedsnake
@@ -848,11 +943,11 @@ snake1head:
                 jmp advance_snake2
 
         advance_not_border:
-                cmp al,clrs1
+                cmp al,28h
                 jnz advance_not_self
                 jmp advance_snake2
         advance_not_self:
-                cmp al,clrs2
+                cmp al,035H
                 jnz advance_not_other
                 jmp advance_snake2
                 NOP
@@ -907,8 +1002,9 @@ advance_shift1:
                 mov dx,[bx]
 
                
-                mov al,0                ;black
-                CALL drawRect
+                mov al, 0               ;black
+                dec SquareWidth              
+                CALL drawSqr
 
         advance_end_del_tail1:
                
@@ -921,16 +1017,38 @@ advance_shift1:
                 mov S1Y,ax
 
 
-;DRAWING NEW Sanke 1 HEAD
-        mov ax,SnakeWidth
-        mov SquareWidth,ax
-        mov cx,S1X
-        mov dx,S1Y
-        mov al,clrs1
+;DRAWING NEW Sanke 1 HEAD                
 
-        CALL drawRect
-                
+        mov cx,s1x+2
+        mov dx,s1y+2
+        lea di,Img_S1_B
+        call Draw_Image
 
+        mov cx,s1x
+        mov dx,s1y
+        cmp DirS1,0
+        je .lft
+        cmp DirS1,1
+        je .up
+        cmp DirS1,2
+        je .rght
+
+        lea di,Img_S1_H_D
+        jmp .eee
+
+        .lft:
+        lea di,Img_S1_H_L
+        jmp .eee
+
+        .rght:
+        lea di,Img_S1_H_R
+        jmp .eee
+
+        .up:
+        lea di,Img_S1_H_U
+
+        .eee:
+        CALL Draw_Image
 
 ;-------------------------------------------------
 ;-------SNAKE 2
@@ -999,12 +1117,12 @@ snake2Head:
         jmp advance_end
         
         advance2_not_border:
-        cmp al,clrs2
+        cmp al,035h
         jnz advance2_not_self
         jmp advance_end
         
         advance2_not_self:
-        cmp al,clrs1
+        cmp al,28h
         jnz advance2_not_other
         jmp advance_end
 
@@ -1062,7 +1180,8 @@ advance_shift2:
 
                
                 mov al,0                ;black
-                CALL drawRect
+                dec SquareWidth              
+                CALL drawSqr
 
         advance_end_del_tail2:
 
@@ -1073,13 +1192,36 @@ advance_shift2:
                 mov S2Y,ax
 
 ;DRAWING NEW Sanke 2 HEAD
-                mov ax,SnakeWidth
-                mov SquareWidth,ax
-                mov cx,S2X
-                mov dx,S2Y
-               
-                mov al,clrs2
-                CALL drawRect
+        mov cx,s2x+2
+        mov dx,s2y+2
+        lea di,Img_S2_B
+        call Draw_Image
+
+        mov cx,s2x
+        mov dx,s2y
+        cmp DirS2,0
+        je .lft2
+        cmp DirS2,1
+        je .up2
+        cmp DirS2,2
+        je .rght2
+
+        lea di,Img_S2_H_D
+        jmp .eee2
+
+        .lft2:
+        lea di,Img_S2_H_L
+        jmp .eee2
+
+        .rght2:
+        lea di,Img_S2_H_R
+        jmp .eee2
+
+        .up2:
+        lea di,Img_S2_H_U
+
+        .eee2:
+        CALL Draw_Image
 advance_end:              
                 RET
 advancesnakes           ENDP

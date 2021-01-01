@@ -60,11 +60,14 @@
 ;-------------------------------------------------------------------------------------------------
 
         Num_Of_Times db 0
+        Num_Of_LOOPs db 0
         Freeze_S1 dw 0
         Freeze_S2 dw 0
         Poison_S1 dw 0
         Poison_S2 dw 0
         poison_active dw 0        
+        Freeze_active dw 0        
+
 
 
 ;
@@ -782,8 +785,12 @@ feedsnake               ENDP
 advancesnakes           PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
           
 ;       Getting NEW Sanke 1 HEAD
-
+        cmp Num_Of_LOOPs,0
+        je snake1head
+        dec Num_Of_LOOPs
+        jmp snake2Head
         ; original head in (si,di)
+snake1head:
         mov si,S1X
         mov di,S1Y
         mov bx,DirS1
@@ -828,6 +835,8 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
 
                 cmp al,02Ch
                 jnz advance_not_food
+
+                mov Freeze_active,1
 
                 mov ax,1
                 CALL feedsnake
@@ -927,7 +936,13 @@ advance_shift1:
 ;-------SNAKE 2
 advance_snake2:
 ;       Getting NEW Sanke 2 HEAD
+        cmp Num_Of_LOOPs,0
+        je snake2Head
+        dec Num_Of_LOOPs
+       jmp L1
                 ; original head in (si,di)
+snake2Head:
+
                 mov si,S2X
                 mov di,S2Y
 
@@ -1113,8 +1128,12 @@ L1:
         mov poison_active,0
         
         Freeze:
+        cmp Freeze_active,0
+        je UP
+        mov Num_Of_LOOPs,50
+        mov Freeze_active,0
         
-   
+               
         UP:    
         cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz Left

@@ -95,7 +95,8 @@
 ;-------------------------------------------------------------------------------------------------
 
         Num_Of_Times db 0
-        Num_Of_LOOPs db 0
+        Num_Of_LOOPs_S1 db 0
+        Num_Of_LOOPs_S2 db 0
         Freeze_S1 dw 0
         Freeze_S2 dw 0
         Poison_S1 dw 0
@@ -880,9 +881,9 @@ feedsnake               ENDP
 advancesnakes           PROC    FAR                              ;DirS1: [0 for left / 1 for up / 2 for right / 3 for down]
           
 ;       Getting NEW Sanke 1 HEAD
-        cmp Num_Of_LOOPs,0
+        cmp Num_Of_LOOPs_S2,0
         je snake1head
-        dec Num_Of_LOOPs
+        dec Num_Of_LOOPs_S2
         jmp snake2Head
         ; original head in (si,di)
 snake1head:
@@ -931,7 +932,7 @@ snake1head:
                 cmp al,02Ch
                 jnz advance_not_food
 
-                ;mov Freeze_active,1
+                mov Freeze_S1,1
 
                 mov ax,1
                 CALL feedsnake
@@ -1054,10 +1055,10 @@ advance_shift1:
 ;-------SNAKE 2
 advance_snake2:
 ;       Getting NEW Sanke 2 HEAD
-        cmp Num_Of_LOOPs,0
+        cmp Num_Of_LOOPs_S1,0
         je snake2Head
-        dec Num_Of_LOOPs
-       jmp L1
+        dec Num_Of_LOOPs_S1
+        jmp L1
                 ; original head in (si,di)
 snake2Head:
 
@@ -1096,6 +1097,7 @@ snake2Head:
 ;---------------CHECK FOR COLLISION S2-------------
 ;--------------------------------------------------
 
+     
         ;       get color of pixel 
         mov cx,si
         mov dx,di
@@ -1107,6 +1109,7 @@ snake2Head:
         cmp al,02Ch
         jnz advance2_not_food
 
+        mov Freeze_S2,1
         mov ax,2
         CALL feedsnake
         jmp advance2_safe
@@ -1135,7 +1138,7 @@ snake2Head:
        
         advance2_safe:
 ;       Shifting SNAKE 2
- 
+       
                 mov ax,Sz2
                 mov bx,2
                 mul bx
@@ -1265,15 +1268,21 @@ L1:
         instantDeath:
         Poison:
         cmp poison_active,0
-        Je Freeze
+        Je Freeze_1
         mov Num_Of_Times,3
         mov poison_active,0
         
-        Freeze:
-        cmp Freeze_active,0
+        Freeze_1:
+        cmp Freeze_S2,0
+        je Freeze_2
+        mov Num_Of_LOOPs_S2,40
+        mov Freeze_S2,0
+        
+        Freeze_2:
+        cmp Freeze_S1,0
         je UP
-        mov Num_Of_LOOPs,50
-        mov Freeze_active,0
+        mov Num_Of_LOOPs_S1,40
+        mov Freeze_S1,0
         
                
         UP:    
@@ -1497,7 +1506,7 @@ L1:
         RightC2_Poison:
         cmp DirS2 , 2      
         je FF1   
-        mov DirS1,0
+        mov DirS2,0
         dec Num_Of_Times
         cmp Num_Of_Times,0
         je STOP3_Poison
@@ -1515,7 +1524,7 @@ L1:
         DownC2_Poison:
         cmp DirS2 , 3      
         je FF1   
-        mov DirS1,1
+        mov DirS2,1
         dec Num_Of_Times
         cmp Num_Of_Times,0
         je STOP3_Poison

@@ -1196,6 +1196,12 @@ snake1head:
         cmp al,10h
         jz advance_dth
 
+        cmp al,1Ah
+        jz advance_dth
+
+        cmp al,15h
+        jz advance_dth
+
         jmp advance_not_dth
 
         advance_dth:
@@ -1562,10 +1568,10 @@ L1:
         ; CALL feedsnake
 
         ; delay function
-        MOV CX, 03H		;cx:dx is used as a register of the time in microsec.
+        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
         MOV DX, 1480H
         MOV AH, 86H	
-        ; INT 15H			;delay interrupt int 15h / ah = 86h
+        INT 15H			;delay interrupt int 15h / ah = 86h
 
 
         mov ah,01

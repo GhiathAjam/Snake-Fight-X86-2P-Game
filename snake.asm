@@ -116,6 +116,8 @@
         Num_Of_LOOPs_S2 db 0
         Freeze_S1 dw 0
         Freeze_S2 dw 0
+        Poison_S1_active dw 0
+        Poison_S2_active dw 0
         Poison_S1 dw 0
         Poison_S2 dw 0
         poison_active dw 0        
@@ -1222,7 +1224,7 @@ snake1head:
         advance_not_frz:
         cmp al,01ch
         jnz advance_not_poison
-        
+        mov Poison_S1_active,1
         mov Poison_S1,1
         ; FATHY here snake 1 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
@@ -1445,7 +1447,7 @@ snake2Head:
         cmp al,01ch
         jnz advance2_not_poison
         mov poison_s2,1
-        mov poison_active,1
+        mov Poison_S2_active,1
         ; FATHY here snake 2 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -1602,30 +1604,31 @@ L1:
         instantKill:
         instantDeath:
         Poison_1:
-        cmp Poison_S1,0
+        cmp Poison_S1_active,0
         Je Poison_2
         mov Num_Of_Times_1,3
-        mov Poison_S1,0
+        mov Poison_S1_active,0
         
         Poison_2:
-        cmp Poison_S2,0
+        cmp Poison_S2_active,0
         Je Freeze_1
         mov Num_Of_Times_2,3
-        mov Poison_S2,0
+        mov Poison_S2_active,0
         
         Freeze_1:
         cmp Freeze_S2,0
         je Freeze_2
-        mov Num_Of_LOOPs_S2,40
+        mov Num_Of_LOOPs_S2,30
         mov Freeze_S2,0
+        jmp up
         
         Freeze_2:
         cmp Freeze_S1,0
         je UP
-        mov Num_Of_LOOPs_S1,40
+        mov Num_Of_LOOPs_S1,30
         mov Freeze_S1,0
-        
-           FFFFFF1:jmp FF1
+        jmp up
+        FFFFFF1:jmp FF1
              
         UP:    
         cmp ah,48h                              ;ZF = 0 if keystroke available.

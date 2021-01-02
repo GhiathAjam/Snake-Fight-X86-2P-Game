@@ -89,7 +89,23 @@
  Img_S2_B   DB 53, 53, 31, 53, 31, 53, 53, 53, 31, 31, 31, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 31, 31 
  DB 31, 53, 53, 53, 31, 53, 31, 53, 53
 
+ Img_frz DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 78, 16, 16, 102, 16, 16, 102, 16, 16, 16, 78, 16, 102, 16, 102, 16, 16, 16, 16, 16, 78, 31, 102, 16, 16, 16, 16, 78, 78, 78
+ DB 78, 31, 102, 102, 16, 16, 16, 16, 78, 31, 102, 16, 16, 16, 16, 16, 78, 16, 102, 16, 102, 16, 16, 16, 78, 16, 16, 102, 16, 16, 102, 16, 16, 16, 16, 16, 16, 16, 16, 16
+ DB 16
 
+ Img_Poison DB 28, 16, 16, 16, 16, 16, 16, 16, 28, 16, 16, 41, 41, 41, 41, 41, 16, 16, 16, 41, 41, 41, 41, 41, 41, 41, 16, 16, 41, 41, 41, 28, 28, 28, 28, 16, 16, 16, 41, 28
+ DB 28, 28, 28, 16, 16, 28, 16, 16, 16, 16, 16, 16, 16, 28, 28, 28, 28, 16, 28, 16, 28, 28, 28, 28, 28, 16, 16, 16, 16, 16, 28, 28, 28, 28, 16, 28, 28, 28, 16, 28
+ DB 28
+
+ Img_Dth DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 16, 16, 16, 26, 26
+ DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 26, 16, 16, 16, 16, 16, 16, 29, 16, 21, 21, 29, 26, 26, 16, 16, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 21, 21, 29
+ DB 29, 29, 26, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 16, 29, 16, 29, 16, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+ DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 29, 16, 29, 16, 29, 16, 16, 16, 29, 16, 16, 16, 16, 26, 26, 16, 16, 16, 26, 26, 26, 26, 26, 16, 16, 16, 16, 29
+ DB 29, 16, 16, 16, 29, 16, 16, 24, 26, 26, 16, 29, 29, 29, 24, 16, 16, 29, 16, 16, 16, 16, 16, 16, 18, 16, 16, 29, 29, 29, 16, 16, 24, 18, 16, 16, 16, 16, 16, 16
+ DB 16, 16, 24, 16, 16, 16, 29, 16, 16, 16, 29, 24, 16, 16, 16, 16, 16, 16, 16, 16, 24, 26, 16, 29, 29, 29, 16, 30, 31, 24, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26
+ DB 29, 29, 29, 29, 29, 31, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 26, 26, 29, 29, 31, 29, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 26, 29, 29
+ DB 29, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+ DB 16, 16, 16, 16
 ;-------------------------------------------------------------------------------------------------
 ;----------------------PowerUPs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
@@ -104,7 +120,8 @@
         poison_active dw 0        
         Freeze_active dw 0        
 
-
+        dth_pwr_X       DW ?
+        dth_pwr_Y       DW ?
 
 ;
 ;-------------------------------------------------------------------------------------------------
@@ -470,6 +487,199 @@ Draw_Image PROC FAR                                ; cx is x - dx is y - di is i
 	Draw_Image         ENDP
 
 ;-------------------------------------------------
+;----------------------DRAW IMAGE POWER--------------
+;-------------------------------------------------
+
+Draw_Image_pwr PROC FAR                                ; cx is x - dx is y - di is image offset - 
+
+        push bx
+        push cx
+        push dx
+
+        add cx,3d
+        add dx,3d
+
+	Draw_Image_pwr_init:
+                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
+                mov food_stop_y, dx
+                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
+                mov food_temp_dx, dx	        ;store dx value to use it in animation
+                sub food_stop_x, 9	        ;subtract the width of the image from cx so as to know where i will stop
+                sub food_stop_y, 9
+                ; dec di
+                ; inc cx
+
+	Draw_Image_pwr_Start: 
+                inc DI
+                DEC Cx       	                ;  loop iteration in x direction
+                cmp cx, food_stop_x
+        JNZ Draw_Image_pwr_Drawit      	        ;  check if we can draw current x and y and excape the y iteration
+                mov Cx, food_temp_cx 	        ;  if loop iteration in y direction, then x should start over so that we sweep the grid
+                dec Dx
+                cmp dx, food_stop_y
+        JZ  Draw_Image_pwr_eee   	        ;  both x and y reached 00 so end program
+
+	Draw_Image_pwr_Drawit:
+                MOV AH,0Ch   	;set the configuration to writing a pixel
+                mov al, [DI]    ; color of the current coordinates
+                xor bx,bx   	;set the page number
+                INT 10h      	;execute the configuration
+        jmp Draw_Image_pwr_Start  
+
+
+        Draw_Image_pwr_eee:
+        pop dx
+        pop cx
+        pop bx
+                                RET
+	Draw_Image_pwr         ENDP
+
+;-------------------------------------------------
+;----------------------DRAW IMAGE POWER Death--------------
+;-------------------------------------------------
+
+Draw_Image_pwr_d PROC FAR                                ; cx is x - dx is y - di is image offset - 
+
+        push bx
+        push cx
+        push dx
+
+        add cx,4d
+        add dx,3d
+
+	Draw_Image_pwr_d_init:
+                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
+                mov food_stop_y, dx
+                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
+                mov food_temp_dx, dx	        ;store dx value to use it in animation
+                sub food_stop_x, 18d	        ;subtract the width of the image from cx so as to know where i will stop
+                sub food_stop_y, 17d
+                ; dec di
+                ; inc cx
+
+	Draw_Image_pwr_d_Start: 
+                inc DI
+                DEC Cx       	                ;  loop iteration in x direction
+                cmp cx, food_stop_x
+        JNZ Draw_Image_pwr_d_Drawit      	;  check if we can draw current x and y and excape the y iteration
+                mov Cx, food_temp_cx 	        ;  if loop iteration in y direction, then x should start over so that we sweep the grid
+                DEC DX       	                ;  loop iteration in y direction
+                DEC cX       	                ;  loop iteration in y direction
+                inc di
+                cmp dx, food_stop_y
+        JZ  Draw_Image_pwr_d_eee   	        ;  both x and y reached 00 so end program
+
+	Draw_Image_pwr_d_Drawit:
+                MOV AH,0Ch   	;set the configuration to writing a pixel
+                mov al, [DI]    ; color of the current coordinates
+                xor bx,bx   	;set the page number
+                INT 10h      	;execute the configuration
+        jmp Draw_Image_pwr_d_Start  
+
+
+        Draw_Image_pwr_d_eee:
+        pop dx
+        pop cx
+        pop bx
+                                RET
+	Draw_Image_pwr_d         ENDP
+
+
+;-------------------------------------------------
+;----------------------DRAW POWER--------------
+;-------------------------------------------------
+draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -- 1          Instant_Death -- 2         Instant_Kill -- 3       Random -- 4  
+
+        ;   MAKE AX ALL RANDOM
+        xor ax, ax
+        int 1ah			;get random value from the ticks of the clock cx:dx
+        mov ax,dx
+        ;   generating X from 0 to 4
+        mov dx, 00h
+        mov bx, 3d 	        ;the width of the screen
+        div bx			;mod the random value with the width to get a random number from 0 to 38
+        ; dl now has from 0 to 4
+        push dx
+
+        cmp dl,4
+        jz pwr_rnd
+        cmp dl,2
+        jz pwr_dth
+        cmp dl,3
+        jz pwr_kill
+        cmp dl,1
+        jz pwr_frz
+
+        pwr_poison:
+        lea di,Img_Poison
+        jmp PL1
+
+        pwr_rnd:
+        lea di,Img_Poison
+        jmp PL1
+
+        pwr_dth:
+        lea di,Img_Dth
+        jmp PL1
+
+        pwr_kill:
+        lea di,Img_Poison
+        jmp PL1
+
+        pwr_frz:
+        lea di,Img_frz
+
+        PL1:
+        push di
+        call random_x_y
+        pop di
+        sub cx,3d
+        sub dx,3d
+
+        pop bx
+        cmp bl,2
+        jnz pwr_not_dth_draw
+        ; check if all squares available for death 2
+        .2_sqrs:
+        push di
+        call random_x_y
+        pop di
+        sub cx,3d
+        sub dx,3d
+
+        mov ah,0dh
+        sub cx,7
+        int 10h
+        and al,al
+        jnz .2_sqrs
+        sub dx,7
+        int 10h
+        and al,al
+        jnz .2_sqrs
+        add cx,7d
+        int 10h
+        and al,al
+        jnz .2_sqrs
+        ; sub cx,7
+        add dx,7
+        ; jnz .2_sqrs
+        mov dth_pwr_X,cx
+        mov dth_pwr_Y,dx
+        jmp pwr_dth_draw
+
+        pwr_not_dth_draw:
+        call Draw_Image_pwr
+        jmp pwr_eee
+
+        pwr_dth_draw:
+        call draw_image_pwr_d
+
+        pwr_eee:
+
+         RET
+draw_pwr ENDP
+
+;-------------------------------------------------
 ;----------------------DRAW ENVIRONMENT--------------
 ;-------------------------------------------------
 drawEnv PROC     FAR
@@ -712,9 +922,9 @@ drawEnv_rght_line:
         jnz obstacle_82
 
 
-        CALL  draw_food
-
-;
+        CALL draw_food
+        CALL draw_pwr 
+;      
 ;INT 10h / AH = 0Ch - change color for a single pixel.
 ;input:
 ;AL = pixel color
@@ -921,42 +1131,92 @@ snake1head:
                 mov S1HY,Di
 
 ;---------------CHECK FOR COLLISION S1-------------
-                ;       get color of pixel 
-                mov cx,si
-                mov dx,di
-                mov ah,0Dh
-                int 10h                 ;AL = pixel color
-                and al,al
-                jz advance_safe
+        ;       get color of pixel 
+        mov cx,si
+        mov dx,di
+        mov ah,0Dh
+        int 10h                 ;AL = pixel color
+        and al,al
+        jz advance_safef
 
-                cmp al,02Ch
-                jnz advance_not_food
+        cmp al,02Ch
+        jnz advance_not_food
 
-                mov Freeze_S1,1
-
-                mov ax,1
-                CALL feedsnake
-                jmp advance_safe
+        mov ax,1
+        CALL feedsnake
+        jmp advance_safe
 
         advance_not_food:        
-                cmp al,0Fh
-                jnz advance_not_border
-                jmp advance_snake2
+        cmp al,0Fh
+        jnz advance_not_border
+        jmp advance_snake2
 
         advance_not_border:
-                cmp al,28h
-                jnz advance_not_self
-                jmp advance_snake2
+        cmp al,28h
+        jnz advance_not_self
+        jmp advance_snake2
+
         advance_not_self:
-                cmp al,035H
-                jnz advance_not_other
-                jmp advance_snake2
-                NOP
+        cmp al,035H
+        jnz advance_not_other
+        jmp advance_snake2
+
+  advance_safef:
+        jmp advance_safe     
+
         advance_not_other:
-                cmp al,07h
-                jnz advance_not_obstacle
-                jmp advance_snake2
-        advance_not_obstacle:              
+        cmp al,07h
+        jnz advance_not_obstacle
+        jmp advance_snake2
+
+        advance_not_obstacle: 
+        cmp al,04eh
+        jnz advance_not_frz
+        ; FATHY here snake 1 ate the freeze do your thing
+        call draw_pwr           ; generate 2nd power       
+        jmp advance_safe
+
+        advance_not_frz:
+        cmp al,01ch
+        jnz advance_not_poison
+        ; FATHY here snake 1 ate the poison do your thing
+        mov SquareWidth,4       ; erasing old poison
+        xor al,al
+        call drawSqr
+        call draw_pwr           ; generate 2nd power       
+        jmp advance_safe
+
+        advance_not_poison:
+        cmp al,1fh
+        jz advance_dth
+
+        cmp al,18h
+        jz advance_dth
+
+        cmp al,10h
+        jz advance_dth
+
+        jmp advance_not_dth
+
+        advance_dth:
+        ; FATHY here snake 1 ate the death do your thing
+        
+        ; erasing old death
+        mov SquareWidth,8      
+        xor al,al
+        push cx
+        push dx
+        mov cx,dth_pwr_X
+        mov dx,dth_pwr_Y
+        sub cx,5
+        sub dx,4
+        call drawSqr
+        POP DX
+        POP CX
+        call draw_pwr           ; generate 2nd power       
+        jmp advance_safe
+
+        advance_not_dth:
         advance_safe:
 
 
@@ -1104,12 +1364,11 @@ snake2Head:
         mov ah,0Dh
         int 10h                 ;AL = pixel color       
         and al,al
-        jz advance2_safe
+        jz advance2_safef
         
         cmp al,02Ch
         jnz advance2_not_food
 
-        mov Freeze_S2,1
         mov ax,2
         CALL feedsnake
         jmp advance2_safe
@@ -1129,14 +1388,65 @@ snake2Head:
         jnz advance2_not_other
         jmp advance_end
 
+  advance2_safef:
+          jmp advance2_safe             
+
         advance2_not_other:
         cmp al,07h
         jnz advance2_not_obstacle
         jmp advance_end
 
         advance2_not_obstacle:              
-       
+        cmp al,04eh
+        jnz advance2_not_frz
+        ; FATHY here snake 2 ate the freeze do your thing
+        call draw_pwr           ; generate 2nd power       
+        jmp advance2_safe
+
+        advance2_not_frz:
+        cmp al,01ch
+        jnz advance2_not_poison
+        ; FATHY here snake 2 ate the poison do your thing
+        mov SquareWidth,4       ; erasing old poison
+        xor al,al
+        call drawSqr
+        call draw_pwr           ; generate 2nd power       
+        jmp advance2_safe
+
+        advance2_not_poison:
+        cmp al,1fh
+        jz advance2_dth
+
+        cmp al,18h
+        jz advance2_dth
+
+        cmp al,10h
+        jz advance2_dth
+
+        jmp advance2_not_dth
+
+        advance2_dth:
+        ; FATHY here snake 2 ate the death do your thing
+        
+        ; erasing old death
+        mov SquareWidth,8      
+        xor al,al
+        push cx
+        push dx
+        mov cx,dth_pwr_X
+        mov dx,dth_pwr_Y
+        sub cx,5
+        sub dx,4
+        call drawSqr
+        POP DX
+        POP CX
+        call draw_pwr           ; generate 2nd power       
+        jmp advance2_safe
+
+        advance2_not_dth:
         advance2_safe:
+
+
 ;       Shifting SNAKE 2
        
                 mov ax,Sz2
@@ -1252,10 +1562,10 @@ L1:
         ; CALL feedsnake
 
         ; delay function
-        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
+        MOV CX, 03H		;cx:dx is used as a register of the time in microsec.
         MOV DX, 1480H
         MOV AH, 86H	
-        INT 15H			;delay interrupt int 15h / ah = 86h
+        ; INT 15H			;delay interrupt int 15h / ah = 86h
 
 
         mov ah,01
@@ -1540,7 +1850,7 @@ FF1:
         MOV AH, 86H	
         ; INT 15H			;delay interrupt int 15h / ah = 86h
       
-        ; CALL draw_food
+        ; CALL draw_pwr
         CALL  advancesnakes
 jmp L1
 
@@ -1560,7 +1870,6 @@ jmp L1
         mov dx,food_temp_dx
         sub cx,4
         sub dx,4
-        ; call drawSqr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         mov ah,4ch

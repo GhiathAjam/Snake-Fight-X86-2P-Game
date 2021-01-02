@@ -110,7 +110,8 @@
 ;----------------------PowerUPs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
 
-        Num_Of_Times db 0
+        Num_Of_Times_1 db 0
+        Num_Of_Times_2 db 0
         Num_Of_LOOPs_S1 db 0
         Num_Of_LOOPs_S2 db 0
         Freeze_S1 dw 0
@@ -1212,6 +1213,8 @@ snake1head:
         advance_not_obstacle: 
         cmp al,04eh
         jnz advance_not_frz
+        mov Freeze_active,1
+        mov Freeze_S1,1
         ; FATHY here snake 1 ate the freeze do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -1219,6 +1222,8 @@ snake1head:
         advance_not_frz:
         cmp al,01ch
         jnz advance_not_poison
+        
+        mov Poison_S1,1
         ; FATHY here snake 1 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -1430,6 +1435,8 @@ snake2Head:
         advance2_not_obstacle:              
         cmp al,04eh
         jnz advance2_not_frz
+        mov Freeze_active,1
+        mov Freeze_S2,1
         ; FATHY here snake 2 ate the freeze do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -1437,6 +1444,8 @@ snake2Head:
         advance2_not_frz:
         cmp al,01ch
         jnz advance2_not_poison
+        mov poison_s2,1
+        mov poison_active,1
         ; FATHY here snake 2 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -1592,11 +1601,17 @@ L1:
         int 16h                                 ;return:
         instantKill:
         instantDeath:
-        Poison:
-        cmp poison_active,0
+        Poison_1:
+        cmp Poison_S1,0
+        Je Poison_2
+        mov Num_Of_Times_1,3
+        mov Poison_S1,0
+        
+        Poison_2:
+        cmp Poison_S2,0
         Je Freeze_1
-        mov Num_Of_Times,3
-        mov poison_active,0
+        mov Num_Of_Times_2,3
+        mov Poison_S2,0
         
         Freeze_1:
         cmp Freeze_S2,0
@@ -1610,7 +1625,8 @@ L1:
         mov Num_Of_LOOPs_S1,40
         mov Freeze_S1,0
         
-               
+           FFFFFF1:jmp FF1
+             
         UP:    
         cmp ah,48h                              ;ZF = 0 if keystroke available.
         jnz Left
@@ -1624,12 +1640,11 @@ L1:
         cmp DirS1 , 1      
         je FFFF1   
         mov DirS1,3
-        dec [Num_Of_Times]
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_1
+        cmp Num_Of_Times_1,0
         je STOP_Poison
         jmp FF1
   
-         FFFFFF1:jmp FF1
       
         Left:
         cmp ah,4Bh                              ;AL = ASCII character. 
@@ -1644,14 +1659,13 @@ L1:
         cmp DirS1 , 0      
         je FFFF1   
         mov DirS1,2
-        dec [Num_Of_Times]
-        cmp Num_Of_Times,0
+        dec [Num_Of_Times_1]
+        cmp Num_Of_Times_1,0
         je STOP_Poison
         jmp FF1
         
         FFFF1:jmp FF1
         STOP_Poison:                                 ;stoping poison
-        mov poison_active,0
         mov Poison_S1,0
         jmp FF1
        
@@ -1669,8 +1683,8 @@ L1:
         cmp DirS1 , 2      
         je FFFF1   
         mov DirS1,0
-        dec [Num_Of_Times]
-        cmp Num_Of_Times,0
+        dec [Num_Of_Times_1]
+        cmp Num_Of_Times_1,0
         je STOP_Poison
         jmp FF1
                                                 ;Down: 0x50
@@ -1687,8 +1701,8 @@ L1:
         cmp DirS1 , 3      
         je FFFF1   
         mov DirS1,1
-        dec [Num_Of_Times]
-        cmp Num_Of_Times,0
+        dec [Num_Of_Times_1]
+        cmp Num_Of_Times_1,0
         je STOP_Poison
         jmp FF1
         
@@ -1707,8 +1721,8 @@ L1:
         cmp DirS2 , 1      
         je FFF1   
         mov DirS2,3
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP2_Poison
         jmp FFF1
 
@@ -1728,8 +1742,8 @@ L1:
         cmp DirS2 , 0      
         je FFF1   
         mov DirS2,2
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP2_Poison
         jmp FFF1
 
@@ -1753,8 +1767,8 @@ L1:
         cmp DirS2 , 2      
         je FFF1   
         mov DirS2,0
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP2_Poison
         jmp FF1
 
@@ -1771,8 +1785,8 @@ L1:
         cmp DirS2 , 3      
         je FFFFF1   
         mov DirS2,1
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP2_Poison
         jmp FF1
         ;FOR CAPITAL LETTERS
@@ -1791,8 +1805,8 @@ L1:
         cmp DirS2 , 1      
         je FFFFF1   
         mov DirS2,3
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP3_Poison
         jmp FF1
 
@@ -1809,13 +1823,12 @@ L1:
         cmp DirS2 , 0      
         je FFFFF1   
         mov DirS2,2
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP3_Poison
         jmp FF1
                                               ;Down: 0x50
         STOP3_Poison:                                 ;stoping poison
-        mov poison_active,0
         mov Poison_S2,0
         jmp FF1
        
@@ -1833,8 +1846,8 @@ L1:
         cmp DirS2 , 2      
         je FF1   
         mov DirS2,0
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP3_Poison
         jmp FF1
 
@@ -1851,8 +1864,8 @@ L1:
         cmp DirS2 , 3      
         je FF1   
         mov DirS2,1
-        dec Num_Of_Times
-        cmp Num_Of_Times,0
+        dec Num_Of_Times_2
+        cmp Num_Of_Times_2,0
         je STOP3_Poison
         jmp FF1
 

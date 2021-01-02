@@ -123,6 +123,10 @@
         dth_pwr_X       DW ?
         dth_pwr_Y       DW ?
 
+        pwr_timer       DW ?
+        prv_pwr         DW ?
+        pwr_X           DW ?
+        pwr_Y           DW ?
 ;
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SNAKE STUFF----------------------------------
@@ -590,16 +594,45 @@ Draw_Image_pwr_d PROC FAR                                ; cx is x - dx is y - d
 ;-------------------------------------------------
 draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -- 1          Instant_Death -- 2         Instant_Kill -- 3       Random -- 4  
 
-        ;   MAKE AX ALL RANDOM
+        ;       erasing old power
+        mov ax,prv_pwr
+        cmp ax,2
+        jnz erase_not_dth
+
+        ;       erasing old death
+        mov SquareWidth,8      
+        xor al,al
+        mov cx,dth_pwr_X
+        mov dx,dth_pwr_Y
+        sub cx,4
+        sub dx,4
+        call drawSqr
+        jmp draw_pwr_init
+
+        erase_not_dth:
+        ;       erasing old power
+        mov cx,pwr_X
+        mov dx,pwr_Y
+        dec dx
+        dec cx
+        mov SquareWidth,4      
+        xor al,al
+        call drawSqr
+
+        draw_pwr_init:
+        ;       generating rnd power
+        ;       MAKE AX ALL RANDOM
         xor ax, ax
         int 1ah			;get random value from the ticks of the clock cx:dx
+        mov pwr_timer,dx
         mov ax,dx
-        ;   generating X from 0 to 4
+        ;       generating X from 0 to 4
         mov dx, 00h
         mov bx, 3d 	        ;the width of the screen
         div bx			;mod the random value with the width to get a random number from 0 to 38
-        ; dl now has from 0 to 4
+        ; dl now has from 0 to 4        / currently two cuz others not yet drawn
         push dx
+        mov prv_pwr,dx        
 
         cmp dl,4
         jz pwr_rnd
@@ -612,22 +645,27 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
 
         pwr_poison:
         lea di,Img_Poison
+        add pwr_timer, 02FH
         jmp PL1
 
         pwr_rnd:
         lea di,Img_Poison
+        add pwr_timer, 02FH
         jmp PL1
 
         pwr_dth:
         lea di,Img_Dth
+        add pwr_timer, 06BH
         jmp PL1
 
         pwr_kill:
         lea di,Img_Poison
+        add pwr_timer, 01FH
         jmp PL1
 
         pwr_frz:
         lea di,Img_frz
+        add pwr_timer, 06FH
 
         PL1:
         push di
@@ -668,6 +706,8 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
         jmp pwr_dth_draw
 
         pwr_not_dth_draw:
+        mov pwr_X,   cx
+        mov pwr_y,   dx
         call Draw_Image_pwr
         jmp pwr_eee
 
@@ -1180,9 +1220,6 @@ snake1head:
         cmp al,01ch
         jnz advance_not_poison
         ; FATHY here snake 1 ate the poison do your thing
-        mov SquareWidth,4       ; erasing old poison
-        xor al,al
-        call drawSqr
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
 
@@ -1207,18 +1244,6 @@ snake1head:
         advance_dth:
         ; FATHY here snake 1 ate the death do your thing
         
-        ; erasing old death
-        mov SquareWidth,8      
-        xor al,al
-        push cx
-        push dx
-        mov cx,dth_pwr_X
-        mov dx,dth_pwr_Y
-        sub cx,5
-        sub dx,4
-        call drawSqr
-        POP DX
-        POP CX
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
 
@@ -1413,9 +1438,6 @@ snake2Head:
         cmp al,01ch
         jnz advance2_not_poison
         ; FATHY here snake 2 ate the poison do your thing
-        mov SquareWidth,4       ; erasing old poison
-        xor al,al
-        call drawSqr
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -1434,18 +1456,6 @@ snake2Head:
         advance2_dth:
         ; FATHY here snake 2 ate the death do your thing
         
-        ; erasing old death
-        mov SquareWidth,8      
-        xor al,al
-        push cx
-        push dx
-        mov cx,dth_pwr_X
-        mov dx,dth_pwr_Y
-        sub cx,5
-        sub dx,4
-        call drawSqr
-        POP DX
-        POP CX
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -1847,7 +1857,7 @@ L1:
         jmp FF1
 
 
-jmp L1  
+L1F:jmp L1  
 
 FF1:
         ; delay function
@@ -1858,6 +1868,12 @@ FF1:
       
         ; CALL draw_pwr
         CALL  advancesnakes
+
+        xor ax, ax
+        int 1ah			;get random value from the ticks of the clock cx:dx
+        cmp dx,pwr_timer
+        jl L1F
+        CALL draw_pwr        
 jmp L1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

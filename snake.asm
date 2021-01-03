@@ -1868,6 +1868,21 @@ L1:
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
      
+        Freeze_1:
+        cmp Freeze_S2,0
+        je Freeze_2
+        mov Num_Of_LOOPs_S2,40
+        mov Freeze_S2,0
+        jmp ff1
+        
+        Freeze_2:
+        cmp Freeze_S1,0
+        je KEYBOARD_PRESS
+        mov Num_Of_LOOPs_S1,40
+        mov Freeze_S1,0
+        jmp ff1
+
+    KEYBOARD_PRESS:
         mov ah,01
         int 16h
         JZ FFFFFF1
@@ -1884,23 +1899,12 @@ L1:
         
         Poison_2:
         cmp poison_active_2,0
-        Je Freeze_1
+        Je up
         mov Num_Of_Times_2,3
         mov poison_active_2,0
-
-        Freeze_1:
-        cmp Freeze_S2,0
-        je Freeze_2
-        mov Num_Of_LOOPs_S2,40
-        mov Freeze_S2,0
-        
-        Freeze_2:
-        cmp Freeze_S1,0
-        je UP
-        mov Num_Of_LOOPs_S1,40
-        mov Freeze_S1,0
         jmp up
-           FFFFFF1:jmp FF1
+
+       FFFFFF1:jmp FF1
              
         UP:    
         cmp ah,48h                              ;ZF = 0 if keystroke available.

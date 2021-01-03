@@ -1425,9 +1425,8 @@ snake1head:
         jz advance_rnd
         jmp advance_not_rnd
 
-        advance_rnd:    
-       
-      RANDSTART: 
+advance_rnd:    
+
         MOV AH, 00h  ; interrupts to get system time        
         INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
 
@@ -1452,11 +1451,12 @@ snake1head:
 
         Poison:
         cmp dl,3
-        jnz advance_not_rnd
+        jnz advance
         mov poison_active_1,1
         mov poison_s1,1
        
         ; FATHY here snake 1 ate the Rnd do your thing
+     advance: 
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
 

@@ -1435,25 +1435,27 @@ advance_rnd:
         mov  cx, 5    
         div  cx       ; here dx contains the remainder of the division - from 0 to 3
 
-        cmp dl,0
-        jnz Death
-
-        Death:
-        cmp dl,1
-        jnz Freeze
-        
         Freeze:
-        cmp dl,2
+        cmp dl,0
         jnz Poison
         mov Freeze_active,1
         mov Freeze_S1,1
        
 
         Poison:
-        cmp dl,3
-        jnz advance
+        cmp dl,1
+        jnz Kill
         mov poison_active_1,1
         mov poison_s1,1
+       
+       Kill:
+        cmp dl,2
+        jnz Death
+
+        Death:
+        cmp dl,3
+        jnz advance
+        
        
         ; FATHY here snake 1 ate the Rnd do your thing
      advance: 
@@ -1710,33 +1712,33 @@ snake2Head:
 
         mov  ax, dx
         xor  dx, dx
-        mov  cx, 4    
+        mov  cx, 5    
         div  cx       ; here dx contains the remainder of the division - from 0 to 3
 
-        add  dl, '0'  ; to ascii from '0' to '3'
-        mov ah, 2h   ; call interrupt to display a value in DL
-        int 21h    
-        
+        Freeze2:
         cmp dl,0
-        jg Death_2
-
-        Death_2:
-        cmp dl,1
-        jg Freeze_3
-        
-        Freeze_3:
-        cmp dl,2
-        jg Poison_3
+        jnz Poison2
         mov Freeze_active,1
         mov Freeze_S2,1
        
 
-        Poison_3:
-        cmp dl,3
+        Poison2:
+        cmp dl,1
+        jnz Kill2
         mov poison_active_2,1
         mov poison_s2,1
        
-        ; FATHY here snake 2 ate the Rnd do your thing
+       Kill2:
+        cmp dl,2
+        jnz Death2
+
+        Death2:
+        cmp dl,3
+        jnz advance2
+        
+       
+     advance2: 
+           ; FATHY here snake 2 ate the Rnd do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -1865,8 +1867,7 @@ L1:
         MOV DX, 1480H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
-
-
+     
         mov ah,01
         int 16h
         JZ FFFFFF1

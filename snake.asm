@@ -91,6 +91,20 @@ imgW    Dw      ?
  Img_S2_B   DB 53, 53, 31, 53, 31, 53, 53, 53, 31, 31, 31, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 31, 53, 31, 53, 31, 31, 53, 31, 31, 31, 31 
   DB 31, 53, 53, 53, 31, 53, 31, 53, 53
 
+;// SNAKE Poisoned Head
+ Img_SP_H_D DB 192, 192, 192, 192, 192, 192, 192, 192, 31, 16, 192, 16, 31, 192, 192, 31, 31, 192, 31, 31, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192 
+  DB 192, 192, 192, 192, 192, 192, 192, 192, 192
+
+ Img_SP_H_L DB 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 31, 31, 192, 192, 192, 192, 192, 31, 16, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 31, 16, 192, 192, 192, 192, 192, 31 
+  DB 31, 192, 192, 192, 192, 192, 192, 192, 192
+
+ Img_SP_H_R DB 192, 192, 192, 192, 192, 192, 192, 192, 31, 31, 192, 192, 192, 192, 192, 16, 31, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 16, 31, 192, 192, 192, 192, 192, 31, 31, 192, 192 
+  DB 192, 192, 192, 192, 192, 192, 192, 192, 192
+
+ Img_SP_H_U DB 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 31, 31, 192, 31, 31, 192, 192, 31, 16, 192, 16 
+  DB 31, 192, 192, 192, 192, 192, 192, 192, 192
+
+
 ;// Powers
  Img_frz DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 78, 16, 16, 102, 16, 16, 102, 16, 16, 16, 78, 16, 102, 16, 102, 16, 16, 16, 16, 16, 78, 31, 102, 16, 16, 16, 16, 78, 78, 78
   DB 78, 31, 102, 102, 16, 16, 16, 16, 78, 31, 102, 16, 16, 16, 16, 16, 78, 16, 102, 16, 102, 16, 16, 16, 78, 16, 16, 102, 16, 16, 102, 16, 16, 16, 16, 16, 16, 16, 16, 16
@@ -1463,6 +1477,11 @@ advance_rnd:
         jmp advance_safe
 
         advance_not_rnd:
+        cmp al,0c0H
+        jnz advance_not_SP
+        jmp advance_snake2
+
+        advance_not_SP:
         advance_safe:
 
 
@@ -1535,6 +1554,9 @@ advance_shift1:
 
         mov cx,s1x
         mov dx,s1y
+        cmp poison_s1,1
+        je S1_P
+
         cmp DirS1,0
         je .lft
         cmp DirS1,1
@@ -1555,10 +1577,34 @@ advance_shift1:
 
         .up:
         lea di,Img_S1_H_U
+        jmp .eee
+
+        S1_P:
+        cmp DirS1,0
+        je Plft
+        cmp DirS1,1
+        je Pup
+        cmp DirS1,2
+        je Prght
+
+        lea di,Img_SP_H_D
+        jmp .eee
+
+        Plft:
+        lea di,Img_SP_H_L
+        jmp .eee
+
+        Prght:
+        lea di,Img_SP_H_R
+        jmp .eee
+
+        Pup:
+        lea di,Img_SP_H_U
+        jmp .eee
+
 
         .eee:
         CALL Draw_Image
-
 ;-------------------------------------------------
 ;-------SNAKE 2
 advance_snake2:
@@ -1743,6 +1789,11 @@ snake2Head:
         jmp advance2_safe
 
         advance2_not_rnd:
+        cmp al,0c0H
+        jnz advance2_not_SP
+        jmp advance_end
+
+        advance2_not_SP:
         advance2_safe:
 
 
@@ -1813,6 +1864,9 @@ advance_shift2:
 
         mov cx,s2x
         mov dx,s2y
+        cmp poison_s2,1
+        je S2_P
+
         cmp DirS2,0
         je .lft2
         cmp DirS2,1
@@ -1833,6 +1887,32 @@ advance_shift2:
 
         .up2:
         lea di,Img_S2_H_U
+        jmp .eee2
+
+        S2_P:
+        cmp DirS2,0
+        je P2lft
+        cmp DirS2,1
+        je P2up
+        cmp DirS2,2
+        je P2rght
+
+        lea di,Img_SP_H_D
+        jmp .eee2
+
+        P2lft:
+        lea di,Img_SP_H_L
+        jmp .eee2
+
+        P2rght:
+        lea di,Img_SP_H_R
+        jmp .eee2
+
+        P2up:
+        lea di,Img_SP_H_U
+        jmp .eee2
+
+
 
         .eee2:
         CALL Draw_Image

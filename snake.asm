@@ -1627,8 +1627,8 @@ imgimg ENDS
 
 
 
-is_2p           db      1
-is_main         db      0
+is_2p           db      0
+is_main         db      1
 s1h_img         Dw      ?
 s2h_img         Dw      ?
 
@@ -1663,8 +1663,8 @@ s_pwr_Y               dw      100d
 
 imgW2 equ 320
 imgH2 equ 200
-imgH    DW      ?
-imgW    Dw      ?
+imgH    Db      ?
+imgW    Db      ?
 ;// FOOD 
 
         food_phases dw 7 dup(?)

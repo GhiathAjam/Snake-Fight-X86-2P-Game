@@ -1981,8 +1981,18 @@ imgW    Dw      ?
         pwr_X           DW ?
         pwr_Y           DW ?
         frst            DW 1
+;-------------------------------------------------------------------------------------------------
+;----------------------SCORE AND LEVELS STUFF----------------------------------
+;-------------------------------------------------------------------------------------------------
 
         level db 1
+P1 db 'P1:','$'
+P2 db 'P2:','$'
+Score1 db 0,'$'
+Score2 db 0,'$'
+
+
+
 ;
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SNAKE STUFF----------------------------------
@@ -2979,6 +2989,7 @@ snake1head:
         cmp al,02Ch
         jnz advance_not_food
 
+        inc [Score1]
         mov ax,1
         CALL feedsnake
         jmp advance_safe
@@ -3045,8 +3056,8 @@ snake1head:
         jmp advance_not_dth
 
         advance_dth:
+        sub score1,5
         ; FATHY here snake 1 ate the death do your thing
-        jmp Win
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
 
@@ -3058,7 +3069,7 @@ snake1head:
         jmp advance_not_kil
 
         advance_kil:
-        jmp Win
+       add score1,5
         ; FATHY here snake 1 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -3096,11 +3107,13 @@ advance_rnd:
        Kill:
         cmp dl,2
         jnz Death
-
+        add score1,5
+      
         Death:
         cmp dl,3
         jnz advance
-        
+        sub score1,5
+      
        
         ; FATHY here snake 1 ate the Rnd do your thing
      advance: 
@@ -3292,6 +3305,7 @@ snake2Head:
         cmp al,02Ch
         jnz advance2_not_food
 
+        inc score2
         mov ax,2
         CALL feedsnake
         jmp advance2_safe
@@ -3359,7 +3373,8 @@ snake2Head:
 
         advance2_dth:
         ; FATHY here snake 2 ate the death do your thing
-        
+         sub score2,5
+      
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -3371,7 +3386,8 @@ snake2Head:
         jmp advance2_not_kil
 
         advance2_kil:
-        ; FATHY here snake 2 ate the KILL do your thing
+         add score2,5
+      ; FATHY here snake 2 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -3408,11 +3424,13 @@ snake2Head:
        Kill2:
         cmp dl,2
         jnz Death2
-
+ add score2,5
+      
         Death2:
         cmp dl,3
         jnz advance2
-        
+         sub score2,5
+      
        
      advance2: 
            ; FATHY here snake 2 ate the Rnd do your thing
@@ -3694,6 +3712,25 @@ MAIN    PROC FAR
         mov ah,0                       
         mov al,13h
         int 10h 
+mov y,0
+mov x,2      ;Setting X,Y position of the text.
+mov di, offset P1  ;Print colored text
+call print
+
+mov y,0
+mov x,20  ;Setting X,Y position of the text
+mov di, offset P2
+call print
+
+        mov y,0
+mov x,5      ;Setting X,Y position of the text.
+mov di, offset Score1  ;Print colored text
+call print
+
+mov y,0
+mov x,23  ;Setting X,Y position of the text
+mov di, offset Score2
+call print
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
@@ -3703,6 +3740,9 @@ MAIN    PROC FAR
 L1:
         ; CALL feedsnake
         ; check the level
+
+
+
         cmp level,2
         je Level2
         

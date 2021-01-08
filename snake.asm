@@ -1982,7 +1982,7 @@ imgW    Dw      ?
         pwr_Y           DW ?
         frst            DW 1
 
-        string1 db "Player 1 win $"
+        level db 1
 ;
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SNAKE STUFF----------------------------------
@@ -2673,6 +2673,9 @@ drawEnv_rght_line:
 
         ; DRAWING OBSTACLES
         ; Drawing Square
+        cmp level,1
+        je LeftCorner
+        
         mov cx,104d
         mov dx,325d
         mov imgH,31d
@@ -2713,6 +2716,7 @@ drawEnv_rght_line:
         call Draw_Image
 
         ; Drawing upper left corner
+    LeftCorner:
         mov cx,32d
         mov dx,56d
         mov imgH,23d
@@ -3698,12 +3702,25 @@ MAIN    PROC FAR
 ; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
 L1:
         ; CALL feedsnake
+        ; check the level
+        cmp level,2
+        je Level2
         
-        ; delay function
+        Level1:
         MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
-        MOV DX, 1480H
+        MOV DX, 2050H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
+        jmp Freeze_1		
+        
+        
+        Level2:
+                                ; delay function
+        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 1300H
+        MOV AH, 86H		;delay interrupt int 15h / ah = 86h
+        INT 15H
+     
      
       
         Freeze_1:

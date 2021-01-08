@@ -1,9 +1,12 @@
+
+
 .model large
-.stack 64
+.stack 128
 
 .data
 
 
+PUBLIC DrawingWin
 color db 0CH
 x db 4
 y db 8
@@ -13,6 +16,7 @@ pt2 db ' Has Won the Match!','$'
 PlayerName db 30,?,30 dup('$')
 M db 30,?,30 dup('$')
 
+imgimg SEGMENT USE16
 
 
 imgW2 equ 320
@@ -1618,6 +1622,7 @@ img2 DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 20
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  
+imgimg ENDS
 
 
 
@@ -1641,7 +1646,7 @@ char_display proc far
   mov  cx, 1  ;HOW MANY TIMES TO DISPLAY CHAR.
   int  10h
   ret
-endp    
+char_display endp    
 
  gotoxy proc far
   mov dl, x
@@ -1650,10 +1655,10 @@ endp
   mov bh, 0 ;PAGE.
   int 10h   ;BIOS SCREEN SERVICES.  
   ret
-endp
+gotoxy endp
 
 print proc far
-while:      
+while2:      
 
   call gotoxy  ;SET CURSOR POSITION FOR CURRENT CHAR.
   mov  al, [ di ]  ;CHAR TO DISPLAY.
@@ -1671,7 +1676,7 @@ while:
   
 next_char:
   inc  di  ;NEXT CHAR IN THE STRING
-  jmp  while
+  jmp  while2
 
 finish:
 call GetCursor
@@ -1692,7 +1697,7 @@ Drawingg2 proc FAR
 		 	;set the configuration
 	       MOV CX, imgW2 	;set the width (X) up to image width (based on image resolution)
 	       MOV DX, imgH2 	;set the hieght (Y) up to image height (based on image resolution)
-	       mov DI, offset img2  ; to iterate over the pixels
+		   mov DI, offset img2  ; to iterate over the pixels
 	       jmp Start2    	;Avoid drawing before the calculations
 	Drawit2:
 	
@@ -1719,7 +1724,7 @@ Drawingg2 endp
 
 
 
-main proc far
+DrawingWin proc far
 
 mov ax, @data
 mov DS, ax
@@ -1758,5 +1763,5 @@ call print ;Printing function!
 
 
 
-main endp
-end main
+DrawingWin endp
+end DrawingWin

@@ -2011,10 +2011,10 @@ imgW    Db      ?
 ;-------------------------------------------------------------------------------------------------
 
         level db 1
-P1 db 'P1:','$'
-P2 db 'P2:','$'
-Score1 db 0,'$'
-Score2 db 0,'$'
+P1 db 'Player1:','$'
+P2 db 'Player2:','$'
+Score1 db 48,48,'$'
+Score2 db 48,48,'$'
 
 
 
@@ -2918,26 +2918,26 @@ init_draws2:
                 mov s2h_img,ax
 
 
-                ; • Set Divisor Latch Access Bit
+                ; ï¿½ Set Divisor Latch Access Bit
                 mov dx,3fbh ; Line Control Register
                 mov al,10000000b ;Set Divisor Latch Access Bit
                 out dx,al ;Out it
-                ; • Set LSB byte of the Baud Rate Divisor Latch register.
+                ; ï¿½ Set LSB byte of the Baud Rate Divisor Latch register.
                 mov dx,3f8h
                 mov al,01h
                 out dx,al
-                ; • Set MSB byte of the Baud Rate Divisor Latch register.
+                ; ï¿½ Set MSB byte of the Baud Rate Divisor Latch register.
                 mov dx,3f9h
                 mov al,00h
                 out dx,al
-                ; • Set port configuration
+                ; ï¿½ Set port configuration
                 mov dx,3fbh
                 mov al,00011011b
-                ; • 0:Access to Receiver buffer, Transmitter buffer
-                ; • 0:Set Break disabled
-                ; • 011:Even Parity
-                ; • 0:One Stop Bit
-                ; • 11:8bits
+                ; ï¿½ 0:Access to Receiver buffer, Transmitter buffer
+                ; ï¿½ 0:Set Break disabled
+                ; ï¿½ 011:Even Parity
+                ; ï¿½ 0:One Stop Bit
+                ; ï¿½ 11:8bits
                 out dx,al
 
                 cmp is_main,1
@@ -3041,7 +3041,7 @@ snake1head:
         cmp al,02Ch
         jnz advance_not_food
 
-        inc [Score1]
+        inc [Score1+1]
         mov ax,1
         CALL feedsnake
         jmp advance_safe
@@ -3105,7 +3105,7 @@ snake1head:
         jmp advance_not_dth
 
         advance_dth:
-        sub score1,5
+        sub [score1+1],5
         ; FATHY here snake 1 ate the death do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -3120,7 +3120,7 @@ snake1head:
         jmp advance_not_kil
 
         advance_kil:
-       add score1,5
+       add [score1+1],5
         ; FATHY here snake 1 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -3158,12 +3158,12 @@ snake1head:
        Kill:
         cmp dl,2
         jnz Death
-        add score1,5
+        add [score1+1],5
       
         Death:
         cmp dl,3
         jnz advance
-        sub score1,5
+        sub [score1+1],5
       
        
         ; FATHY here snake 1 ate the Rnd do your thing
@@ -3361,7 +3361,7 @@ snake2Head:
         cmp al,02Ch
         jnz advance2_not_food
 
-        inc score2
+        inc [score2+1]
         mov ax,2
         CALL feedsnake
         jmp advance2_safe
@@ -3426,7 +3426,7 @@ snake2Head:
 
         advance2_dth:
         ; FATHY here snake 2 ate the death do your thing
-         sub score2,5
+         sub [score2+1],5
       
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -3441,7 +3441,7 @@ snake2Head:
         jmp advance2_not_kil
 
         advance2_kil:
-         add score2,5
+         add [score2+1],5
       ; FATHY here snake 2 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -3479,12 +3479,12 @@ snake2Head:
        Kill2:
         cmp dl,2
         jnz Death2
- add score2,5
+        add [score2+1],5
       
         Death2:
         cmp dl,3
         jnz advance2
-         sub score2,5
+         sub [score2+1],5
       
        
      advance2: 
@@ -3856,24 +3856,15 @@ MAIN    PROC FAR
         mov al,13h
         int 10h 
 mov y,0
-mov x,2      ;Setting X,Y position of the text.
+mov x,1      ;Setting X,Y position of the text.
 mov di, offset P1  ;Print colored text
 call print
 
 mov y,0
-mov x,20  ;Setting X,Y position of the text
+mov x,12  ;Setting X,Y position of the text
 mov di, offset P2
 call print
 
-        mov y,0
-mov x,5      ;Setting X,Y position of the text.
-mov di, offset Score1  ;Print colored text
-call print
-
-mov y,0
-mov x,23  ;Setting X,Y position of the text
-mov di, offset Score2
-call print
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
@@ -3891,10 +3882,37 @@ jmp secondary
         cmp ah,01Fh
         ; jnz start_key        
 
+
 L1:
+       Score1_L1:
+        cmp [score1+1],58
+        jnz Score2_L1
+        inc [score1]
+        mov [score1+1],48
+       
+       
+       Score2_L1:
+        cmp [score2+1],58
+        jnz printscoreL1
+        inc [score2]
+        mov [score2+1],48
+        ;print score
+       printscoreL1:
+        mov y,0
+        mov x,9      ;Setting X,Y position of the text.
+        mov di, offset Score1  ;Print colored text
+        call print
+
+        mov y,0
+        mov x,20  ;Setting X,Y position of the text
+        mov di, offset Score2
+        call print
+
+       
+       
+       
         ; CALL feedsnake
         ; check the level
-
 
 
         cmp level,2
@@ -4377,6 +4395,28 @@ L1Ff: jmp L1
 
 
 secondary:
+
+        cmp [score1+1],58
+        jnz Score2_Sec
+        inc [score1]
+        mov [score1+1],48
+      
+      Score2_Sec:
+        cmp [score2+1],58
+        jnz printscore
+        inc [score2]
+        mov [score2+1],48
+        ;print score
+       printscore:
+        mov y,0
+        mov x,8      ;Setting X,Y position of the text.
+        mov di, offset Score1+1  ;Print colored text
+        call print
+
+        mov y,0
+        mov x,21  ;Setting X,Y position of the text
+        mov di, offset Score2
+        call print
 
         ;------------------------------------
         ;--------Recieve STUFF AS 2nd---------

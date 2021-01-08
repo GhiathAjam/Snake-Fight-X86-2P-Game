@@ -5,15 +5,43 @@
 ;-------------------------------------------------------------------------------------------------
 ;----------------------DATA SEGMENT----------------------------------
 ;-------------------------------------------------------------------------------------------------
-        .DATA
+.DATA
+
+is_2p           db      1
+is_main         db      0
+s1h_img         Dw      ?
+s2h_img         Dw      ?
+
+Sz1o             db  2
+S1Xo             DW  304d,296d,198d dup(?)            
+S1Yo             DW  192d,192d,198d dup(?)
+
+Sz2o             db  2
+S2Xo             DW  16d,24d,198d dup(?)            
+S2Yo             DW  192d,192d,198d dup(?)
+
+food_x          dw      16d
+food_xo         dw      16d
+
+food_y          dw      100d
+food_yo         dw      100d
+
+pwr_img_hw         Db      1
+pwr_img_hwo         Db      1
+pwr_img              dw      ?
+pwr_Xo               dw      16d
+pwr_Yo               dw      100d
+s_pwr_X               dw      16d
+s_pwr_Y               dw      100d
+
 
 ;-------------------------------------------------------------------------------------------------
 ;----------------------IMAGEs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
 
-imgH    DW      ?
-imgW    Dw      ?
-;// FOOD 
+imgH    Db      ?
+imgW    Db      ?
+;// FOOD and images variables
 
         food_phases dw 7 dup(?)
         food_phase_num dw ?
@@ -114,35 +142,32 @@ imgW    Dw      ?
   DB 28, 28, 28, 16, 16, 28, 16, 16, 16, 16, 16, 16, 16, 28, 28, 28, 28, 16, 28, 16, 28, 28, 28, 28, 28, 16, 16, 16, 16, 16, 28, 28, 28, 28, 16, 28, 28, 28, 16, 28
   DB 28
 
- Img_Dth DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 16, 16, 16, 26, 26
-  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 26, 16, 16, 16, 16, 16, 16, 29, 16, 21, 21, 29, 26, 26, 16, 16, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 21, 21, 29
-  DB 29, 29, 26, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 16, 29, 16, 29, 16, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 29, 16, 29, 16, 29, 16, 16, 16, 29, 16, 16, 16, 16, 26, 26, 16, 16, 16, 26, 26, 26, 26, 26, 16, 16, 16, 16, 29
-  DB 29, 16, 16, 16, 29, 16, 16, 24, 26, 26, 16, 29, 29, 29, 24, 16, 16, 29, 16, 16, 16, 16, 16, 16, 18, 16, 16, 29, 29, 29, 16, 16, 24, 18, 16, 16, 16, 16, 16, 16
-  DB 16, 16, 24, 16, 16, 16, 29, 16, 16, 16, 29, 24, 16, 16, 16, 16, 16, 16, 16, 16, 24, 26, 16, 29, 29, 29, 16, 30, 31, 24, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26
-  DB 29, 29, 29, 29, 29, 31, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 26, 26, 29, 29, 31, 29, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 26, 29, 29
-  DB 29, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-  DB 16, 16, 16, 16
+ Img_Dth DB 16, 16, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 16, 16, 26, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 26, 16, 16, 16, 16, 16, 29, 16, 21 
+  DB 21, 29, 26, 26, 16, 16, 29, 16, 16, 16, 16, 16, 16, 16, 16, 21, 21, 29, 29, 29, 26, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 16, 29, 16, 29, 16, 29, 16 
+  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26, 16, 16, 29, 16, 29, 16, 29, 16, 16, 16, 29, 16, 16, 16, 26 
+  DB 26, 16, 16, 16, 26, 26, 26, 26, 26, 16, 16, 16, 16, 29, 29, 16, 16, 29, 16, 16, 24, 26, 26, 16, 29, 29, 29, 24, 16, 16, 29, 16, 16, 16, 16, 16, 18, 16, 16, 29 
+  DB 29, 29, 16, 16, 24, 18, 16, 16, 16, 16, 16, 16, 16, 24, 16, 16, 16, 29, 16, 16, 16, 29, 24, 16, 16, 16, 16, 16, 16, 16, 24, 26, 16, 29, 29, 29, 16, 30, 31, 24 
+  DB 16, 16, 16, 16, 16, 16, 16, 16, 26, 29, 29, 29, 29, 29, 31, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 29, 26, 26, 29, 29, 31, 29, 29, 16, 16, 16, 16, 16, 16, 16 
+  DB 16, 16, 16, 29, 26, 29, 29, 29, 29, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 
+  DB 16, 16, 16, 16, 16, 16, 16, 16, 16
 
- Img_Rnd DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-  DB 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-  DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 31, 255, 255
-  DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255
-  DB 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-  DB 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31
-  DB 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 31, 31
-  DB 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-  DB 255, 255, 255, 255
+ Img_Rnd DB 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 
+  DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255 
+  DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 
+  DB 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255 
+  DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31 
+  DB 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 31, 31, 255, 255, 255, 255, 255, 255, 255 
+  DB 255, 255, 255, 31, 31, 31, 31, 31, 31, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 
+  DB 255, 255, 255, 255, 255, 255, 255, 255, 255
 
- Img_Kil DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 43, 139, 0, 0, 0, 0
-  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 139, 139, 139, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 185, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  DB 6, 42, 6, 0, 6, 185, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 42, 6, 185, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 42, 42
-  DB 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 6, 43, 44, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 6, 68, 6, 0
-  DB 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 0, 0, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  DB 0, 0, 6, 44, 43, 44, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 68, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 68, 43, 68
-  DB 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 31, 43, 31, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 31, 68, 31, 6, 0, 0, 0, 0, 0
-  DB 0, 0, 0, 0, 0, 0, 0, 0, 6, 31, 31, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  DB 0, 0, 0, 0
+ Img_Kil DB 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 43, 139, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 139, 139, 139, 254, 254, 254, 254, 254, 254 
+  DB 254, 6, 6, 254, 254, 254, 6, 185, 6, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 42, 6, 254, 6, 185, 6, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 42, 6, 185 
+  DB 6, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 42, 42, 6, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 6, 44, 6, 43, 44, 6, 254, 254, 254, 254, 254 
+  DB 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 6, 68, 6, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 0, 0, 6, 6, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43 
+  DB 44, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 44, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44, 43, 68, 6, 0, 0, 0, 0, 0, 0 
+  DB 0, 0, 0, 0, 0, 6, 68, 43, 68, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 31, 43, 31, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 68 
+  DB 31, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0, 0 
+  DB 0, 0, 0, 0, 0, 0, 0, 0, 0
 ;  
 ;// Obstacles 
  Img_obst_bl DB 6, 6, 6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 0, 42, 6, 6, 6, 6, 6, 6, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 42 
@@ -353,7 +378,7 @@ imgW    Dw      ?
         dth_pwr_Y       DW ?
 
         pwr_timer       DW ?
-        prv_pwr         DW ?
+        prv_pwr         Db ?
         pwr_X           DW ?
         pwr_Y           DW ?
         frst            DW 1
@@ -378,12 +403,12 @@ imgW    Dw      ?
         SquareWidth     DW  ?
 
         ; num of points for Snake 1
-        Sz1             DW  5d
+        Sz1             Db  2d
         ; 0 for left / 1 for up / 2 for right / 3 for down
-        DirS1           DW  0
+        DirS1           Db  0
         ; points  of snake (snakewidth*2 away from each other)
-        S1X             DW  6400d dup(?)            
-        S1Y             DW  6400d dup(?)
+        S1X             DW  200d dup(?)            
+        S1Y             DW  200d dup(?)
         ; for growing
         IsSnake1Fed     DB  0
         ; new head for moving
@@ -391,10 +416,10 @@ imgW    Dw      ?
         S1HY            DW ?
 
         ; Snake 2
-        Sz2             DW  5d
-        DirS2           DW  2
-        S2X             DW  6400d dup(?)
-        S2Y             Dw  6400d dup(?)
+        Sz2             Db  2d
+        DirS2           Db  2
+        S2X             DW  200d dup(?)
+        S2Y             Dw  200d dup(?)
         IsSnake2Fed     DB  0
         S2HX            DW ?
         S2HY            DW ?
@@ -412,6 +437,13 @@ imgW    Dw      ?
 ;----------------------CODE SEGMENT----------------------------------
 ;-------------------------------------------------------------------------------------------------
     .code
+;-------------------------------------------------
+;----------------------P2 INPUT  --------------
+;-------------------------------------------------
+Input_p2 PROC
+        
+        ret
+Input_p2 ENDP
 ;-------------------------------------------------
 ;----------------------DRAW SQUARE--------------
 ;-------------------------------------------------
@@ -466,7 +498,6 @@ drawSqr              PROC    FAR
 ;DX = row.                
                         RET
 drawSqr              ENDP
-
 ;-------------------------------------------------
 ;----------------------DRAW RECT--------------
 ;-------------------------------------------------
@@ -525,9 +556,6 @@ drawRect              PROC    FAR
 ;DX = row.                
                         RET
 drawRect              ENDP
-
-
-
 ;-------------------------------------------------
 ;----------------------RANDOM X Y IN CX DX--------------
 ;-------------------------------------------------
@@ -597,12 +625,10 @@ random_x_y      proc FAR
 
                 ret
 random_x_y      ENDP
-
-;-------------------------------------------------
+;------------------------------------------------
 ;----------------------BIG RANDOM X Y IN CX DX--------------
 ;-------------------------------------------------
 Big_random_x_y      proc FAR
-
         Big_rnd_again:
         call random_x_y
         sub cx,3d
@@ -626,12 +652,9 @@ Big_random_x_y      proc FAR
 
                 ret
 Big_random_x_y      ENDP
-
-
 ;-------------------------------------------------
 ;----------------------DRAW FOOD--------------
 ;-------------------------------------------------
-
 draw_food PROC FAR
 
         mov food_phases, offset food_img
@@ -647,6 +670,8 @@ draw_food PROC FAR
                 mov food_phase_num, offset food_phases
                 mov DI, food_phases             ; to iterate over the pixels
                 call random_x_y	                ;call function that return random numbers in cx and dx
+                mov food_x, cx	                ;copy the values of cx & dx into external variables
+                mov food_y, dx
                 mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
                 mov food_stop_y, dx
                 mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
@@ -695,10 +720,75 @@ draw_food PROC FAR
                         RET
 	draw_food       ENDP
 
+;-------------------------------------------------
+;----------------------DRAW FOOD given cx,dx--------------
+;-------------------------------------------------
+draw_food_given PROC FAR
+
+        mov food_phases, offset food_img
+        mov food_phases + 2, offset food_img2
+        mov food_phases + 4, offset food_img3
+        mov food_phases + 6, offset food_img4
+        mov food_phases + 8, offset food_img5
+        mov food_phases + 10, offset food_img6
+        mov food_phases + 12, offset food_img7
+
+	draw_food_init_given:
+                mov food_phase_size, 7
+                mov food_phase_num, offset food_phases
+                mov DI, food_phases             ; to iterate over the pixels
+                mov food_x, cx	                ;copy the values of cx & dx into external variables
+                mov food_y, dx
+                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
+                mov food_stop_y, dx
+                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
+                mov food_temp_dx, dx	        ;store dx value to use it in animation
+                sub food_stop_x, food_imgW	;subtract the width of the image from cx so as to know where i will stop
+                sub food_stop_y, food_imgH
+        jmp draw_food_Start_given    	                        ;Avoid drawing before the calculations
+
+	draw_food_Drawit_given:
+                MOV AH,0Ch   	;set the configuration to writing a pixel
+                mov al, [DI]    ; color of the current coordinates
+                xor bx,bx   	;set the page number
+                INT 10h      	;execute the configuration
+        jmp draw_food_Start_given  
+
+	draw_food_Start_given: 
+                inc DI
+                DEC Cx       	        ;  loop iteration in x direction
+                cmp cx, food_stop_x
+        JNZ draw_food_Drawit_given      	        ;  check if we can draw current x and y and excape the y iteration
+                mov Cx, food_temp_cx 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+                DEC DX       	        ;  loop iteration in y direction
+                cmp dx, food_stop_y
+        JZ  draw_food_animate_given   	                ;  both x and y reached 00 so end program
+        Jmp draw_food_Drawit_given
+
+
+
+	draw_food_animate_given:
+                MOV CX, 00H		;cx:dx is used as a register of the time in microsec.
+                MOV DX, 02d40H
+                MOV AH, 86H	
+                INT 15H
+                
+                dec food_phase_size
+        jz draw_food_ENDING_given
+                mov bx, food_phase_num
+                add bx, 2
+                mov food_phase_num, bx
+                mov di, [bx]
+                mov cx, food_temp_cx
+                mov dx, food_temp_dx
+        jmp draw_food_Drawit_given
+
+	draw_food_ENDING_given:
+                        RET
+	draw_food_given       ENDP
 ;-----------------------------------------------------------------------------
 ;----------------------DRAW IMAGE with given height and weight--------------
 ;-----------------------------------------------------------------------------
-
 Draw_Image PROC FAR                                ; cx is x - dx is y - di is image offset - imgw $ imgh
 
         push bx
@@ -714,9 +804,11 @@ Draw_Image PROC FAR                                ; cx is x - dx is y - di is i
                 mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
                 mov food_temp_dx, dx	        ;store dx value to use it in animation
                 push bp
-                mov bp,imgW
+                mov bp,word ptr imgW
+                and bp,0FFh
                 sub food_stop_x, bp	        ;subtract the width of the image from cx so as to know where i will stop
-                mov bp,imgh
+                mov bp,word ptr imgh
+                and bp,0FFh
                 sub food_stop_y, bp
                 pop bp
                 dec di
@@ -746,106 +838,6 @@ Draw_Image PROC FAR                                ; cx is x - dx is y - di is i
         pop bx
                                 RET
 	Draw_Image         ENDP
-
-;-------------------------------------------------
-;----------------------DRAW IMAGE POWER--------------
-;-------------------------------------------------
-
-Draw_Image_pwr PROC FAR                                ; cx is x - dx is y - di is image offset - 
-
-        push bx
-        push cx
-        push dx
-
-        add cx,3d
-        add dx,3d
-
-	Draw_Image_pwr_init:
-                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
-                mov food_stop_y, dx
-                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
-                mov food_temp_dx, dx	        ;store dx value to use it in animation
-                sub food_stop_x, 9	        ;subtract the width of the image from cx so as to know where i will stop
-                sub food_stop_y, 9
-                ; dec di
-                ; inc cx
-
-	Draw_Image_pwr_Start: 
-                inc DI
-                DEC Cx       	                ;  loop iteration in x direction
-                cmp cx, food_stop_x
-        JNZ Draw_Image_pwr_Drawit      	        ;  check if we can draw current x and y and excape the y iteration
-                mov Cx, food_temp_cx 	        ;  if loop iteration in y direction, then x should start over so that we sweep the grid
-                dec Dx
-                cmp dx, food_stop_y
-        JZ  Draw_Image_pwr_eee   	        ;  both x and y reached 00 so end program
-
-	Draw_Image_pwr_Drawit:
-                MOV AH,0Ch   	;set the configuration to writing a pixel
-                mov al, [DI]    ; color of the current coordinates
-                xor bx,bx   	;set the page number
-                INT 10h      	;execute the configuration
-        jmp Draw_Image_pwr_Start  
-
-
-        Draw_Image_pwr_eee:
-        pop dx
-        pop cx
-        pop bx
-                                RET
-	Draw_Image_pwr         ENDP
-
-;-------------------------------------------------
-;----------------------DRAW IMAGE POWER Death--------------
-;-------------------------------------------------
-
-Draw_Image_pwr_d PROC FAR                                ; cx is x - dx is y - di is image offset - 
-
-        push bx
-        push cx
-        push dx
-
-        add cx,4d
-        add dx,3d
-
-	Draw_Image_pwr_d_init:
-                mov food_stop_x, cx	        ;copy the values of cx & dx into external variables
-                mov food_stop_y, dx
-                mov food_temp_cx, cx    	;store cx into a variable to reinitialize cx with it
-                mov food_temp_dx, dx	        ;store dx value to use it in animation
-                sub food_stop_x, 18d	        ;subtract the width of the image from cx so as to know where i will stop
-                sub food_stop_y, 17d
-                ; dec di
-                ; inc cx
-
-	Draw_Image_pwr_d_Start: 
-                inc DI
-                DEC Cx       	                ;  loop iteration in x direction
-                cmp cx, food_stop_x
-        JNZ Draw_Image_pwr_d_Drawit      	;  check if we can draw current x and y and excape the y iteration
-                mov Cx, food_temp_cx 	        ;  if loop iteration in y direction, then x should start over so that we sweep the grid
-                DEC DX       	                ;  loop iteration in y direction
-                DEC cX       	                ;  loop iteration in y direction
-                inc di
-                cmp dx, food_stop_y
-        JZ  Draw_Image_pwr_d_eee   	        ;  both x and y reached 00 so end program
-
-	Draw_Image_pwr_d_Drawit:
-                MOV AH,0Ch   	;set the configuration to writing a pixel
-                mov al, [DI]    ; color of the current coordinates
-                xor bx,bx   	;set the page number
-                INT 10h      	;execute the configuration
-        jmp Draw_Image_pwr_d_Start  
-
-
-        Draw_Image_pwr_d_eee:
-        pop dx
-        pop cx
-        pop bx
-                                RET
-	Draw_Image_pwr_d         ENDP
-
-
 ;-------------------------------------------------
 ;----------------------DRAW POWER--------------
 ;-------------------------------------------------
@@ -859,8 +851,8 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
    
         erase_init:
         ;       erasing old power
-        mov ax,prv_pwr
-        cmp ax,2
+        mov al,prv_pwr
+        cmp al,2
         jl erase_not_dth
 
         ;       erasing old death
@@ -896,7 +888,7 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
         div bx			;mod the random value with the width to get a random number from 0 to 38
         ; dl now has from 0 to 4        / currently two cuz others not yet drawn
         push dx
-        mov prv_pwr,dx        
+        mov prv_pwr,dl      
 
         cmp dl,4
         jz pwr_rnd
@@ -909,30 +901,36 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
 
         pwr_poison:
         lea di,Img_Poison
+        mov pwr_img_hw,9d
         add pwr_timer, 02FH
         jmp PL1
 
         pwr_rnd:
         lea di,Img_Rnd
+        mov pwr_img_hw,17d
         add pwr_timer, 02FH
         jmp PL1
 
         pwr_dth:
         lea di,Img_Dth
+        mov pwr_img_hw,17d
         add pwr_timer, 06BH
         jmp PL1
 
         pwr_kill:
         lea di,Img_Kil
+        mov pwr_img_hw,17d
         add pwr_timer, 01FH
         jmp PL1
 
         pwr_frz:
         lea di,Img_frz
+        mov pwr_img_hw,9d
         add pwr_timer, 06FH
 
         PL1:
         push di
+        mov pwr_img,di
         call random_x_y
         pop di
         sub cx,3d
@@ -946,21 +944,31 @@ draw_pwr PROC FAR                                  ; Poison -- 0        Freeze -
         call Big_random_x_y
         pop di
         mov dth_pwr_X,cx
+        mov s_pwr_X,cx
         mov dth_pwr_Y,dx
+        mov s_pwr_Y,dx
         jmp pwr_dth_draw
 
         pwr_not_dth_draw:
         mov pwr_X,   cx
+        mov s_pwr_X,cx
         mov pwr_y,   dx
-        call Draw_Image_pwr
+        mov s_pwr_Y,dx
+        mov pwr_img_hw,9d
+        mov imgw,9
+        mov imgh,9
+        call draw_image
         jmp pwr_eee
 
         pwr_dth_draw:
-        call draw_image_pwr_d
+        mov pwr_img_hw,17d
+        mov imgw,17d
+        mov imgh,17d
+        call draw_image
 
         pwr_eee:
 
-         RET
+        RET
 draw_pwr ENDP
 
 ;-------------------------------------------------
@@ -1045,7 +1053,7 @@ drawEnv_rght_line:
         jl drawEnv_rght_line
 
 
-        ; DRAWING OBSTACLES
+; DRAWING OBSTACLES
         ; Drawing Square
         mov cx,104d
         mov dx,325d
@@ -1119,8 +1127,6 @@ drawEnv_rght_line:
         mov di,offset Img_obst_bl
         call Draw_Image
 
-        CALL draw_food
-        CALL draw_pwr 
 ;      
 ;INT 10h / AH = 0Ch - change color for a single pixel.
 ;input:
@@ -1146,15 +1152,18 @@ INIT                    PROC FAR
         sub ax,SnakeWidth
         sub ax,SnakeWidth
         ; sub ax,SnakeWidth
-        mov cx,Sz1
+        mov cl,sz1
+        mov ch,0
 initlpp:        sub ax,SnakeWidth
                 LOOP initlpp
-                mov cx,Sz1
+                mov cl,Sz1
+                mov ch,0
 initlpp2:       sub ax,SnakeWidth
                 LOOP initlpp2
 
         ; parameters for loop
-        mov cx,Sz1
+        mov cl,Sz1
+        mov ch,0
         lea si,S1X
         lea di,S1Y
 
@@ -1180,7 +1189,8 @@ init_L1:
         lea Di,S1Y
         add si,2
         add di,2
-        mov Bp,Sz1
+        mov Bp,word ptr Sz1
+        and bp,0FH
         dec Bp
         mov imgW,7
         mov imgH,7
@@ -1207,7 +1217,8 @@ init_draws1:
         ; add ax,SnakeWidth
 
         ; parameters for loop
-        mov cx,Sz2
+        mov cl,Sz2
+        mov ch,0
         lea si,S2X
         lea di,S2Y
 
@@ -1216,7 +1227,8 @@ init_ll2:
         add ax,SnakeWidth
         LOOP init_ll2
 
-        mov cx,Sz2
+        mov cl,Sz2
+        mov ch,0
 init_L2:
         mov [si],ax
         mov [di],dx
@@ -1240,7 +1252,8 @@ init_L2:
         lea Di,S2Y
         add si,2
         add di,2
-        mov Bp,Sz1
+        mov Bp,word ptr Sz1
+        and bp,0FH
         dec Bp
         mov imgW,7
         mov imgH,7
@@ -1256,6 +1269,44 @@ init_draws2:
                 add di,2
                 dec Bp
                 jnz init_draws2
+
+                ; initializing sending stuff
+                lea ax,Img_S1_H_L
+                mov s1h_img,ax
+
+                lea ax,Img_S2_H_R
+                mov s2h_img,ax
+
+
+                ; • Set Divisor Latch Access Bit
+                mov dx,3fbh ; Line Control Register
+                mov al,10000000b ;Set Divisor Latch Access Bit
+                out dx,al ;Out it
+                ; • Set LSB byte of the Baud Rate Divisor Latch register.
+                mov dx,3f8h
+                mov al,01h
+                out dx,al
+                ; • Set MSB byte of the Baud Rate Divisor Latch register.
+                mov dx,3f9h
+                mov al,00h
+                out dx,al
+                ; • Set port configuration
+                mov dx,3fbh
+                mov al,00011011b
+                ; • 0:Access to Receiver buffer, Transmitter buffer
+                ; • 0:Set Break disabled
+                ; • 011:Even Parity
+                ; • 0:One Stop Bit
+                ; • 11:8bits
+                out dx,al
+
+                cmp is_main,1
+                jnz no_draw_food
+
+                CALL draw_food
+                CALL draw_pwr 
+
+                no_draw_food:
                 ret
 INIT                   ENDP
 ;-------------------------------------------------
@@ -1305,7 +1356,8 @@ advancesnakes           PROC    FAR                              ;DirS1: [0 for 
 snake1head:
         mov si,S1X
         mov di,S1Y
-        mov bx,DirS1
+        mov bx,word ptr DirS1
+        mov bh,0
         cmp bx,4
         jz advance_left
         and bx,bx
@@ -1368,7 +1420,7 @@ snake1head:
         jnz advance_not_other
         jmp advance_snake2
 
-  advance_safef:
+        advance_safef:
         jmp advance_safe     
 
         advance_not_other:
@@ -1400,16 +1452,13 @@ snake1head:
         jmp advance_safe
 
         advance_not_poison:
-        cmp al,18h
+        cmp al,1Dh
         jz advance_dth
 
         cmp al,10h
         jz advance_dth
 
         cmp al,1Ah
-        jz advance_dth
-
-        cmp al,15h
         jz advance_dth
 
         jmp advance_not_dth
@@ -1421,9 +1470,11 @@ snake1head:
         jmp advance_safe
 
         advance_not_dth:
-        cmp al,02bh
+        cmp al,044h
         jz advance_kil
-        cmp al,0b9h
+        cmp al,006h
+        jz advance_kil
+        cmp al,0feh
         jz advance_kil
         jmp advance_not_kil
 
@@ -1439,55 +1490,56 @@ snake1head:
         jz advance_rnd
         jmp advance_not_rnd
 
-advance_rnd:    
+        advance_rnd:    
 
-        MOV AH, 00h  ; interrupts to get system time        
-        INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+                MOV AH, 00h  ; interrupts to get system time        
+                INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
 
-        mov  ax, dx
-        xor  dx, dx
-        mov  cx, 5    
-        div  cx       ; here dx contains the remainder of the division - from 0 to 3
+                mov  ax, dx
+                xor  dx, dx
+                mov  cx, 5    
+                div  cx       ; here dx contains the remainder of the division - from 0 to 3
 
-        Freeze:
-        cmp dl,0
-        jnz Poison
-        mov Freeze_active,1
-        mov Freeze_S1,1
-       
-
-        Poison:
-        cmp dl,1
-        jnz Kill
-        mov poison_active_1,1
-        mov poison_s1,1
-       
-       Kill:
-        cmp dl,2
-        jnz Death
-
-        Death:
-        cmp dl,3
-        jnz advance
+                Freeze:
+                cmp dl,0
+                jnz Poison
+                mov Freeze_active,1
+                mov Freeze_S1,1
         
-       
-        ; FATHY here snake 1 ate the Rnd do your thing
-     advance: 
-        call draw_pwr           ; generate 2nd power       
-        jmp advance_safe
+
+                Poison:
+                cmp dl,1
+                jnz Kill
+                mov poison_active_1,1
+                mov poison_s1,1
+        
+                Kill:
+                cmp dl,2
+                jnz Death
+
+                Death:
+                cmp dl,3
+                jnz advance
+                
+        
+                ; FATHY here snake 1 ate the Rnd do your thing
+                advance: 
+                call draw_pwr           ; generate 2nd power       
+                jmp advance_safe
 
         advance_not_rnd:
         cmp al,0c0H
         jnz advance_not_SP
         jmp advance_snake2
 
-        advance_not_SP:
-        advance_safe:
+advance_not_SP:
+advance_safe:
 
 
 ;       SHIFTING ALL Snake 1 VALUES RIGHT FOR NEW HEAD POINT
        
-                mov ax,Sz1
+                mov al,Sz1
+                mov ah,0
                 mov bx,2
                 mul bx
 
@@ -1495,7 +1547,8 @@ advance_rnd:
                 mov di,offset S1Y
                 add si,ax
                 add di,ax
-                mov cx,Sz1
+                mov cl,Sz1
+                mov ch,0
 advance_shift1:
                 mov ax,[si-2]
                 mov [si],ax
@@ -1517,7 +1570,8 @@ advance_shift1:
         advance_del_tail1:            
                 mov ax,SnakeWidth
                 mov SquareWidth,ax
-                mov ax,Sz1
+                mov al,Sz1
+                mov ah,0
                 mov bx,2
                 mul bx
                 mov bx,ax
@@ -1604,6 +1658,7 @@ advance_shift1:
 
 
         .eee:
+        mov s1h_img,di
         CALL Draw_Image
 ;-------------------------------------------------
 ;-------SNAKE 2
@@ -1619,7 +1674,8 @@ snake2Head:
                 mov si,S2X
                 mov di,S2Y
 
-                mov bx,DirS2
+                mov bx,word ptr DirS2
+                mov bh,0
                 and bx,bx
                 jz advance_left2
                 cmp bx,1
@@ -1680,8 +1736,8 @@ snake2Head:
         jnz advance2_not_other
         jmp advance_end
 
-  advance2_safef:
-          jmp advance2_safe             
+        advance2_safef:
+        jmp advance2_safe             
 
         advance2_not_other:
         cmp al,34h
@@ -1712,16 +1768,13 @@ snake2Head:
         jmp advance2_safe
 
         advance2_not_poison:
-        cmp al,18h
+        cmp al,1Dh
         jz advance2_dth
 
         cmp al,10h
         jz advance2_dth
 
         cmp al,1Ah
-        jz advance2_dth
-
-        cmp al,15h
         jz advance2_dth
 
         jmp advance2_not_dth
@@ -1733,9 +1786,11 @@ snake2Head:
         jmp advance2_safe
 
         advance2_not_dth:
-        cmp al,02bh
+        cmp al,044h
         jz advance2_kil
-        cmp al,0b9h
+        cmp al,006h
+        jz advance2_kil
+        cmp al,0feh
         jz advance2_kil
         jmp advance2_not_kil
 
@@ -1753,40 +1808,40 @@ snake2Head:
 
         advance2_rnd:
 
-        MOV AH, 00h  ; interrupts to get system time        
-        INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+                MOV AH, 00h  ; interrupts to get system time        
+                INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
 
-        mov  ax, dx
-        xor  dx, dx
-        mov  cx, 5    
-        div  cx       ; here dx contains the remainder of the division - from 0 to 3
+                mov  ax, dx
+                xor  dx, dx
+                mov  cx, 5    
+                div  cx       ; here dx contains the remainder of the division - from 0 to 3
 
-        Freeze2:
-        cmp dl,0
-        jnz Poison2
-        mov Freeze_active,1
-        mov Freeze_S2,1
-       
-
-        Poison2:
-        cmp dl,1
-        jnz Kill2
-        mov poison_active_2,1
-        mov poison_s2,1
-       
-       Kill2:
-        cmp dl,2
-        jnz Death2
-
-        Death2:
-        cmp dl,3
-        jnz advance2
+                Freeze2:
+                cmp dl,0
+                jnz Poison2
+                mov Freeze_active,1
+                mov Freeze_S2,1
         
-       
-     advance2: 
-           ; FATHY here snake 2 ate the Rnd do your thing
-        call draw_pwr           ; generate 2nd power       
-        jmp advance2_safe
+
+                Poison2:
+                cmp dl,1
+                jnz Kill2
+                mov poison_active_2,1
+                mov poison_s2,1
+        
+                Kill2:
+                cmp dl,2
+                jnz Death2
+
+                Death2:
+                cmp dl,3
+                jnz advance2
+                
+        
+                advance2: 
+                ; FATHY here snake 2 ate the Rnd do your thing
+                call draw_pwr           ; generate 2nd power       
+                jmp advance2_safe
 
         advance2_not_rnd:
         cmp al,0c0H
@@ -1799,7 +1854,8 @@ snake2Head:
 
 ;       Shifting SNAKE 2
        
-                mov ax,Sz2
+                mov al,Sz2
+                mov ah,0
                 mov bx,2
                 mul bx
 
@@ -1807,7 +1863,8 @@ snake2Head:
                 mov di,offset S2Y
                 add si,ax
                 add di,ax
-                mov cx,Sz2
+                mov cl,Sz2
+                mov ch,0
 advance_shift2:
                 mov ax,[si-2]
                 mov [si],ax
@@ -1831,7 +1888,8 @@ advance_shift2:
         advance_del_tail2: 
                 mov ax,SnakeWidth
                 mov SquareWidth,ax
-                mov ax,Sz2
+                mov al,Sz2
+                mov ah,0
                 mov bx,2
                 mul bx
                 mov bx,ax
@@ -1915,11 +1973,96 @@ advance_shift2:
 
 
         .eee2:
+        mov s2h_img,di
         CALL Draw_Image
 advance_end:              
                 RET
 advancesnakes           ENDP
 
+
+;-------------------------------------------------
+;----------------------send char in bl--------------
+;-------------------------------------------------
+Sendchar        PROC    Far     ;put in bl - puts 0 in bp if fail
+
+        push ax
+        push dx
+
+        ;Check that Transmitter Holding Register is Empty
+        mov dx , 3FDH ; Line Status Register
+        fffail:      
+        In al , dx ;Read Line Status
+        and al , 00100000b
+        JZ fffail 
+
+        mov al,bl
+        mov dx , 3F8H ; Transmit data register
+        out dx , al
+
+        pop dx
+        pop ax
+
+                ret
+Sendchar        ENDP
+
+;-------------------------------------------------
+;----------------------send word in bl--------------
+;-------------------------------------------------
+SendWord        PROC    Far     ;put in bl - puts 0 in bp if fail
+
+        push ax
+
+        mov ah,bh
+        call Sendchar
+        mov bl,ah
+        call Sendchar
+
+        pop ax
+
+                ret
+SendWord        ENDP
+
+
+;-------------------------------------------------
+;----------------------recieve char in bl--------------
+;-------------------------------------------------
+RecieveChar      PROC    Far    
+
+        push ax
+        push dx
+
+
+        ;Check that Data is Ready
+        mov dx , 3FDH ; Line Status Register
+        bdsada:       
+        in al , dx
+        and al , 1b
+        JZ bdsada 
+
+        mov dx , 03F8H
+        in al , dx
+        mov bl,al
+
+        pop dx
+        pop ax
+        ret
+RecieveChar     ENDP
+;-------------------------------------------------
+;----------------------recieve Word in bl--------------
+;-------------------------------------------------
+RecieveWord      PROC    Far    
+
+        push ax
+
+        call RecieveChar
+        mov al,bl
+        call RecieveChar
+        mov ah,bl
+
+        mov bx,ax
+        pop ax
+        ret
+RecieveWord     ENDP
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ;|||||||||||||||||||||      MAIN FUNC       ||||||||||||||||||||||||
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -1937,8 +2080,19 @@ MAIN    PROC FAR
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; mov bp,1
-; NEED TO ADD RESTRICTION TO RIGHT AND LEFT (w.r.t SNAKE) ONLY
+
+cmp is_main,1
+jz L1
+
+jmp secondary
+
+        ; PRESS   'S'  TO START
+        start_key:
+        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+        int 16h                                 ;return: ah_scan code
+        cmp ah,01Fh
+        ; jnz start_key        
+
 L1:
         ; CALL feedsnake
 
@@ -1957,18 +2111,11 @@ L1:
         
         Freeze_2:
         cmp Freeze_S1,0
-        je KEYBOARD_PRESS
+        je instantKill
         mov Num_Of_LOOPs_S1,40
         mov Freeze_S1,0
         jmp ff1
 
-    KEYBOARD_PRESS:
-        mov ah,01
-        int 16h
-        JZ FFFFFF1
-        
-        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
-        int 16h                                 ;return:
         instantKill:
         instantDeath:
         Poison_1:
@@ -1979,9 +2126,17 @@ L1:
         
         Poison_2:
         cmp poison_active_2,0
-        Je up
+        Je KEYBOARD_PRESS
         mov Num_Of_Times_2,3
         mov poison_active_2,0
+
+    KEYBOARD_PRESS:
+        mov ah,01
+        int 16h
+        JZ FFFFFF1
+        
+        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+        int 16h                                 ;return:
         jmp up
 
        FFFFFF1:jmp FF1
@@ -2045,8 +2200,7 @@ L1:
         dec [Num_Of_Times_1]
         cmp Num_Of_Times_1,0
         je STOP_Poison
-        jmp FF1
-                                                ;Down: 0x50
+        jmp FF1                                                ;Down: 0x50
         Down:   
         cmp ah,50h
         jnz UP2
@@ -2064,11 +2218,11 @@ L1:
         cmp Num_Of_Times_1,0
         je STOP_Poison
         jmp FF1
-        
-        
-        
+
         UP2:   
-        cmp al,77h                              ;AL = ASCII character. 
+        cmp is_2p,1
+        jz FFFF1
+        cmp ah,11h                              ;AL = ASCII character. 
         jnz Left2
         cmp DirS2,3
         je FFF1  
@@ -2089,7 +2243,7 @@ L1:
 
 
         Left2:  
-        cmp al,61h                              ;And the scan codes for the arrow keys are:
+        cmp ah,01eh                              ;And the scan codes for the arrow keys are:
         jnz Right2                                  ;Up: 0x48
         cmp DirS2,2
         je FFF1 
@@ -2110,10 +2264,9 @@ L1:
         mov Poison_S2,0
         jmp FF1
        
-        LL1: jmp L1
                                                         ;Down: 0x50
         Right2:
-        cmp al,64h
+        cmp ah,20h
         jnz Down2 
         cmp DirS2,0
         je FFF1  
@@ -2131,8 +2284,8 @@ L1:
         jmp FF1
 
         Down2:  
-        cmp al,73h
-        jnz UpC2
+        cmp ah,01Fh
+        jnz pause_key
         cmp DirS2,1
         je FFFFF1  
         cmp Poison_S2,1
@@ -2147,107 +2300,584 @@ L1:
         cmp Num_Of_Times_2,0
         je STOP2_Poison
         jmp FF1
-        ;FOR CAPITAL LETTERS
-                FFFFF1:jmp FF1
+        FFFFF1:jmp FF1
 
-        UPC2:    
-        cmp al,57h                              ;AL = ASCII character. 
-        jnz LeftC2
-        cmp DirS2,3
-        je FFFFF1  
-        cmp Poison_S2,1
-        je UPC2_Poison
-        mov DirS2 , 1
-        jmp FF1
-        UPC2_Poison:
-        cmp DirS2 , 1      
-        je FFFFF1   
-        mov DirS2,3
-        dec Num_Of_Times_2
-        cmp Num_Of_Times_2,0
-        je STOP3_Poison
+        pause_key:
+        cmp ah,19h
+        jnz chat_key 
+        pause_game:
+        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+        int 16h                                 ;return: ah_scan code
+        cmp ah,19h
+        jnz pause_game        
         jmp FF1
 
-        LeftC2:   
-        cmp al,41h                              ;And the scan codes for the arrow keys are:
-        jnz RightC2                                  ;Up: 0x48
-        cmp DirS2,2
-        je FFFFF1  
-        cmp Poison_S2,1
-        je LeftC2_Poison
-        mov DirS2 , 0                           ;Left: 0x4B
-        jmp FF1                                 ;Right: 0x4D
-        LeftC2_Poison:
-        cmp DirS2 , 0      
-        je FFFFF1   
-        mov DirS2,2
-        dec Num_Of_Times_2
-        cmp Num_Of_Times_2,0
-        je STOP3_Poison
-        jmp FF1
-                                              ;Down: 0x50
-        STOP3_Poison:                                 ;stoping poison
-        mov Poison_S2,0
-        jmp FF1
-       
-        
-        RightC2:     
-        cmp al,44h
-        jnz DownC2 
-        cmp DirS2,0
-        je FF1  
-        cmp Poison_S2,1
-        je RightC2_Poison
-        mov DirS2 , 2   
-        jmp FF1
-        RightC2_Poison:
-        cmp DirS2 , 2      
-        je FF1   
-        mov DirS2,0
-        dec Num_Of_Times_2
-        cmp Num_Of_Times_2,0
-        je STOP3_Poison
+        chat_key:
+        cmp ah,02eh
+        jnz FF1
+        ; OMAR HERE CHAT 
         jmp FF1
 
-        DownC2:     
-        cmp al,53h
-        jnz FF1  
-        cmp DirS2,1
-        je FF1  
-        cmp Poison_S2,1
-        je DownC2_Poison
-        mov DirS2 , 3   
-        jmp FF1
-        DownC2_Poison:
-        cmp DirS2 , 3      
-        je FF1   
-        mov DirS2,1
-        dec Num_Of_Times_2
-        cmp Num_Of_Times_2,0
-        je STOP3_Poison
-        jmp FF1
-
-
-L1F:jmp L1  
 
 FF1:
+
+cmp is_2p,1
+jz sssend
+jmp no_sssend
+
+sssend:
+        ;------------------------------------
+        ;--------SEND STUFF AS MAIN---------
+        ;------------------------------------
+                ; send frame start flag
+                        ;Check that Transmitter Holding Register is Empty
+                        mov dx , 3FDH ; Line Status Register
+                        fffailx:      
+                        In al , dx ;Read Line Status
+                        test al , 00100000b
+                        JZ fffailx
+                        mov dx , 03F8H
+                        mov al,0ffh
+                        out dx,al
+                ; send s1 size 
+                        mov bl,sz1
+                        call Sendchar
+                        nop
+
+                ; send s1 head pos              
+                        mov bx,s1x
+                        call SendWord
+                        nop
+                        mov bx,s1y
+                        call SendWord
+                        nop
+                        nop
+                        nop
+                        nop
+
+                ; send s1 head img
+                        mov bx,s1h_img
+                        call SendWord
+                        nop
+
+                ; sending s1 body X-Y
+                        mov si,offset S1X
+                        mov di,offset S1Y
+                        add si,2
+                        add di,2
+                        mov cl,sz1
+                        mov ch,0
+                        dec cl
+                        send_S1_B:
+                        mov bx,[si]
+                        call SendWord
+                        mov bx,[di]
+                        call SendWord
+                        add si,2
+                        add di,2
+                        nop
+                        loop send_S1_B
+
+                ; send s2 size 
+                        mov bl,Sz2
+                        call Sendchar
+                        nop
+
+                ; send s2 head pos
+                        mov bx,s2x
+                        call SendWord
+                        nop
+                        mov bx,s2y
+                        call SendWord
+                        nop
+                        nop
+
+                ; send s2 head img
+                        mov bx,s2h_img
+                        call SendWord
+                        nop
+
+                ; sending s2 body X-Y
+                        mov si,offset S2X
+                        mov di,offset S2Y
+                        add si,2
+                        add di,2
+                        mov cl,sz2
+                        mov ch,0
+                        dec cl
+                        send_S2_B:
+                        mov bx,[si]
+                        call SendWord
+                        mov bx,[di]
+                        call SendWord
+                        add si,2
+                        add di,2
+                        nop
+                        loop send_S2_B
+
+                ; Send food
+                        mov bx,food_x
+                        call SendWord
+                        mov bx,food_y
+                        call SendWord
+
+                ; Send Power X,Y & IMG
+                        mov bl,pwr_img_hw
+                        call Sendchar
+                        mov bx,s_pwr_X
+                        call SendWord
+                        mov bx,s_pwr_y
+                        call SendWord
+                        mov bx,pwr_img
+                        call SendWord
+                ; Send Scores
+
+                ; Send Event
+
+                ; RECIEVE INPUT FROM P2
+                        mov dx , 3FDH ; Line Status Register
+                        in al , dx
+                        and al , 1
+                        JZ s_FFF1 
+                        mov dx , 03F8H
+                        in al , dx
+                        MOV AH,al
+                        s_UP2:   
+                        cmp ah,11h                              ;AL = ASCII character. 
+                        jnz s_Left2
+                        cmp DirS2,3
+                        je s_FFF1  
+                        cmp Poison_S2,1
+                        je s_UP2_Poison
+                        mov DirS2 , 1
+                        jmp s_FF1
+                        s_UP2_Poison:
+                        cmp DirS2 , 1      
+                        je s_FFF1   
+                        mov DirS2,3
+                        dec Num_Of_Times_2
+                        cmp Num_Of_Times_2,0
+                        je s_STOP2_Poison
+                        jmp s_FFF1
+
+                        s_FFF1:jmp s_FF1
+
+
+                        s_Left2:  
+                        cmp ah,01eh                              ;And the scan codes for the arrow keys are:
+                        jnz s_Right2                                  ;Up: 0x48
+                        cmp DirS2,2
+                        je s_FFF1 
+                        cmp Poison_S2,1
+                        je s_Left2_Poison
+                        mov DirS2 , 0                           ;Left: 0x4B
+                        jmp s_FF1                                  ;Right: 0x4D
+                        s_Left2_Poison:
+                        cmp DirS2 , 0      
+                        je s_FFF1   
+                        mov DirS2,2
+                        dec Num_Of_Times_2
+                        cmp Num_Of_Times_2,0
+                        je s_STOP2_Poison
+                        jmp s_FFF1
+
+                        s_STOP2_Poison:                                 ;stoping poison
+                        mov Poison_S2,0
+                        jmp s_FF1
+                
+                                                                        ;Down: 0x50
+                        s_Right2:
+                        cmp ah,20h
+                        jnz s_Down2 
+                        cmp DirS2,0
+                        je s_FFF1  
+                        cmp Poison_S2,1
+                        je s_Right2_Poison
+                        mov DirS2 , 2   
+                        jmp s_FF1
+                        s_Right2_Poison:
+                        cmp DirS2 , 2      
+                        je s_FFF1   
+                        mov DirS2,0
+                        dec Num_Of_Times_2
+                        cmp Num_Of_Times_2,0
+                        je s_STOP2_Poison
+                        jmp s_FF1
+
+                        s_Down2:  
+                        cmp ah,01Fh
+                        jnz s_pause_key
+                        cmp DirS2,1
+                        je s_FFFFF1  
+                        cmp Poison_S2,1
+                        je s_Down2_Poison
+                        mov DirS2 , 3   
+                        jmp s_FF1
+                        s_Down2_Poison:
+                        cmp DirS2 , 3      
+                        je s_FFFFF1   
+                        mov DirS2,1
+                        dec Num_Of_Times_2
+                        cmp Num_Of_Times_2,0
+                        je s_STOP2_Poison
+                        jmp s_FF1
+                        s_FFFFF1:jmp s_FF1
+
+                        s_pause_key:
+                        cmp ah,19h
+                        jnz s_chat_key 
+                        s_pause_game:
+                        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+                        int 16h                                 ;return: ah_scan code
+                        cmp ah,19h
+                        jnz s_pause_game        
+                        jmp s_FF1
+
+                        s_chat_key:
+                        cmp ah,02eh
+                        jnz s_FF1
+                        ; OMAR HERE CHAT 
+                        jmp s_FF1
+                        s_FF1:
+        ;-----------------------
+        ;-----------------------
+
+no_sssend:
         ; delay function
         MOV CX, 1eH		;cx:dx is used as a register of the time in microsec.
         MOV DX, 8480H
         MOV AH, 86H	
         ; INT 15H			;delay interrupt int 15h / ah = 86h
       
-        ; CALL draw_pwr
         CALL  advancesnakes
-        ; call draw_food
 
         xor ax, ax
         int 1ah			;get random value from the ticks of the clock cx:dx
         cmp dx,pwr_timer
-        jl L1F
+        jl L1Ff
         CALL draw_pwr    
             
-jmp L1
+L1Ff: jmp L1
+
+
+
+secondary:
+
+        ;------------------------------------
+        ;--------Recieve STUFF AS 2nd---------
+        ;------------------------------------
+                ;  Recieve frame begin
+                        Rec_Fr_Bgx:
+                        ;Check that Data is Ready
+                        mov dx , 3FDH ; Line Status Register
+                        bdsadax:       
+                        in al , dx
+                        and al , 1b
+                        JZ bdsadax
+                        mov dx , 03F8H
+                        in al , dx
+                        cmp al,0FFH
+                        jnz Rec_Fr_Bgx
+
+                ; Recieve s1 size 
+                        nop
+                        call RecieveChar
+                        mov sz1,bl
+                        nop
+                        nop
+                        nop
+                        nop
+
+                ; Recieve s1 head pos
+                        nop
+                        call RecieveWord
+                        mov cx,bx      
+                        mov s1x,Cx
+                        call RecieveWord
+                        mov dx,bx
+                        mov s1y,dx
+
+                        
+                ; Recieve s1 head img
+                        nop
+                        call RecieveWord
+                        mov s1h_img,bx
+
+                ; Recieve s1 body X-Y
+                        mov si,offset S1X
+                        mov di,offset S1Y
+                        add si,2
+                        add di,2
+                        mov cl,sz1
+                        mov ch,0
+                        dec cl
+                        res_S1_B:
+                        nop
+                        call RecieveWord
+                        mov [si],bx
+                        call RecieveWord
+                        mov [di],bx
+                        add si,2
+                        add di,2
+                        loop res_S1_B
+
+                ; Recieve s2 size 
+                        nop
+                        call RecieveChar
+                        mov Sz2,bl
+
+                ; Recieve s2 head pos
+                        nop
+                        call RecieveWord
+                        mov cx,bx      
+                        mov s2x,Cx
+                        call RecieveWord
+                        mov dx,bx
+                        mov s2y,dx
+
+                ; Recieve s2 head img
+                        nop
+                        call RecieveWord
+                        mov s2h_img,bx
+
+                ; Recieve s2 body X-Y
+                        mov si,offset S2X
+                        mov di,offset S2Y
+                        add si,2
+                        add di,2
+                        mov cl,sz2
+                        mov ch,0
+                        dec cl
+                        res_S2_B:
+                        nop
+                        call RecieveWord
+                        mov [si],bx
+                        call RecieveWord
+                        mov [di],bx
+                        add si,2
+                        add di,2
+                        loop res_S2_B
+
+                ; Recieve food
+                        call RecieveWord
+                        mov food_x,bx
+                        call RecieveWord
+                        mov food_y,bx
+
+                ; Recieve Power X,Y & IMG
+                        call RecieveChar
+                        mov pwr_img_hw,bl
+                        call RecieveWord
+                        mov s_pwr_X,bx
+                        call RecieveWord
+                        mov s_pwr_y,bx
+                        call RecieveWord
+                        mov pwr_img,bx
+                ; Recieve Scores
+
+                ; Recieve Event
+
+        ; GET INPUT AND SEND IT
+                mov bl,0FFH
+                mov ah,01
+                int 16h
+                jz send_input
+                mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+                int 16h                                 ;return: ah_scan code
+                mov bl,ah
+
+                send_input:
+                call Sendchar
+        ; DRAW STUFFFFFFFF
+                ;del old s1             
+                        lea si,S1Xo
+                        lea bx,S1Yo
+                        mov SquareWidth,3
+                        mov bp,word ptr Sz1o
+                        and bp,0FFH
+                        draw_res_del_s1:
+                        mov cx,[si]
+                        mov dx,[bx]
+                        add si,2
+                        add bx,2
+                        xor al,al
+                        call drawSqr
+                        dec bP
+                        jnz draw_res_del_s1
+
+                ;del old s2             
+                        lea si,S2Xo
+                        lea bx,S2Yo
+                        mov SquareWidth,3
+                        mov bp,word ptr Sz2o
+                        and bp,0FFH
+                        draw_res_del_s2:
+                        mov cx,[si]
+                        mov dx,[bx]
+                        add si,2
+                        add bx,2
+                        call drawSqr
+                        dec bP
+                        jnz draw_res_del_s2
+
+                ;del old food
+                        mov cx,food_xo
+                        sub cx,4
+                        mov dx,food_Yo
+                        sub dx,4
+                        mov SquareWidth,4
+                        xor al,al
+                        call drawSqr
+
+                ;del old pwr
+                        mov cx,pwr_xo
+                        sub cx,3
+                        mov dx,pwr_yo
+                        sub dx,3
+                        cmp pwr_img_hwo,17d
+                        jl s_erase_pwr_small
+                        sub cx,2
+                        sub dx,2
+                        mov SquareWidth,8
+                        jmp s_erase_pwr
+                        s_erase_pwr_small:
+                        add cx,2
+                        add dx,2
+                        mov SquareWidth,4
+                        s_erase_pwr:
+                        xor al,al
+                        call drawSqr
+                ;Snake 1
+                        lea si,S1X
+                        lea bx,S1Y
+                        MOV CX,[si]
+                        MOV DX,[bx]
+                        mov imgH,7
+                        mov imgW,7
+                        MOV di,s1h_img
+                        call Draw_Image
+                        add si,2
+                        add bx,2
+                        mov bp,word ptr Sz1
+                        and bp,0FFH
+                        dec bP
+                        draw_res_s1:
+                        lea di,Img_S1_B
+                        mov cx,[si]
+                        mov dx,[bx]
+                        add si,2
+                        add bx,2
+                        CALL Draw_Image
+                        dec bP
+                        jnz draw_res_s1
+
+                ;Snake 2
+                        lea si,S2X
+                        lea bx,S2Y
+                        MOV CX,[SI]
+                        MOV DX,[bx]
+                        mov imgH,7
+                        mov imgW,7
+                        MOV di,s2h_img
+                        call Draw_Image
+                        add si,2
+                        add bx,2
+                        mov bp,word ptr Sz2
+                        and bp,0FFH
+                        dec bp
+                        draw_res_s2:
+                        lea di,Img_S2_B
+                        mov cx,[si]
+                        mov dx,[bx]
+                        add si,2
+                        add bx,2
+                        CALL Draw_Image
+                        dec bP
+                        jnz draw_res_s2
+
+                ;Food
+                        mov cx,food_x
+                        sub cx,3
+                        mov dx,food_y
+                        sub dx,3
+                        lea di,food_img7
+                        mov imgH,9
+                        mov imgw,9
+                        call draw_image
+                ;PWR
+                        mov bl,pwr_img_hw
+                        mov imgw,bl
+                        mov imgh,bl
+                        mov cx,s_pwr_x
+                        mov dx,s_pwr_y
+                        mov di,pwr_img
+                        call Draw_Image
+
+                ; set O values
+                        mov bl,sz1
+                        mov sz1o,bl
+                        mov bl,sz2
+                        mov sz2o,bl
+
+                        mov bx,food_x
+                        mov food_xo,bx
+                        mov bx,food_y
+                        mov food_yo,bx
+
+                        mov bx,s_pwr_x
+                        mov pwr_Xo,bx
+                        mov bx,s_pwr_y
+                        mov pwr_yo,bx
+                        mov bl,pwr_img_hw
+                        mov pwr_img_hwo,bl
+
+                ; O of S1
+                        lea si,S1X
+                        lea bx,S1Y
+                        lea di,S1Xo
+                        lea ax,S1Yo
+                        mov bp,word ptr Sz1
+                        and bp,0FFH
+                        set_res_s1:
+                        mov dx,[si]
+                        mov [di],dx
+                        mov dx,[bx]
+                        xchg ax,bx
+                        mov [bx],dx
+                        xchg ax,bx
+                        add si,2
+                        add bx,2
+                        add di,2
+                        add ax,2
+                        dec bP
+                        jnz set_res_s1
+
+                ; O of S2
+                        lea si,S2X
+                        lea bx,S2Y
+                        lea di,S2Xo
+                        lea ax,S2Yo
+                        mov bp,word ptr Sz2
+                        and bp,0FFH
+                        set_res_s2:
+                        mov dx,[si]
+                        mov [di],dx
+                        mov dx,[bx]
+                        xchg ax,bx
+                        mov [bx],dx
+                        xchg ax,bx
+                        add si,2
+                        add bx,2
+                        add di,2
+                        add ax,2
+                        dec bP
+                        jnz set_res_s2
+
+        ;-----------------------        
+        ;-----------------------
+
+
+jmp secondary
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	click:
@@ -2256,8 +2886,11 @@ jmp L1
         MOV DX, 1880H
         MOV AH, 86H	
         ; INT 15H			;delay interrupt int 15h / ah = 86h
-
-
+ggggg:
+        mov dl,'F'
+        mov ah,2
+        int 21h
+jmp ggggg
         ;       DELETING FOOD
         mov SquareWidth,4
         xor al,al

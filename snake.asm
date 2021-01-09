@@ -4884,6 +4884,8 @@ s_pwr_Y               dw      100d
 ;-------------------------------------------------------------------------------------------------
 ;----------------------IMAGEs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
+
+
 imgWw equ 320
 imgHh equ 200
 imgWl equ 320
@@ -5233,16 +5235,26 @@ imgW    Db      ?
         pwr_X           DW ?
         pwr_Y           DW ?
         frst            DW 1
+
+        
+
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SCORE AND LEVELS STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
 
-        level db 1
+level dw 0
 P1 db 'Player1:','$'
 P2 db 'Player2:','$'
 Score1 db 48,48,'$'
 Score2 db 48,48,'$'
-
+statues1_poison db "Player1 ate poison ",'$'
+statues1_ice db "Player2 has been freezed",'$'
+statues1_scoreinc db "Player1 inc 5 score",'$'
+statues1_scoredec db "Player1 dec 5 score",'$'
+statues2_poison db "Player2 ate poison ",'$'
+statues2_ice db "Player1 has been freezed",'$'
+statues2_scoreinc db "Player2 inc 5 score",'$'
+statues2_scoredec db "Player2 dec 5 score",'$'
 
 
 ;
@@ -6176,6 +6188,148 @@ init_draws2:
                 no_draw_food:
                 ret
 INIT                   ENDP
+
+
+
+;-------------------------------------------------
+;----------------------Printing--------------            ; this works by telling advance snake function not to delete tail next time snake moves
+;-------------------------------------------------
+
+
+
+
+;winning
+
+GetCursor proc far
+
+mov ah,3h
+mov bh,0h    ;Gets the most recent cursor position 
+int 10h
+
+ret
+GetCursor endp
+
+char_display proc far
+  mov  ah, 9
+  mov  bh, 0
+  mov  bl, 0101  ;ANY COLOR.
+  mov  cx, 1  ;HOW MANY TIMES TO DISPLAY CHAR.
+  int  10h
+  ret
+char_display endp    
+
+ gotoxy proc far
+  mov dl, x
+  mov dh, y
+  mov ah, 2 ;SERVICE TO SET CURSOR POSITION.
+  mov bh, 0 ;PAGE.
+  int 10h   ;BIOS SCREEN SERVICES.  
+  ret
+gotoxy endp
+
+print proc far
+while2:      
+
+  call gotoxy  ;SET CURSOR POSITION FOR CURRENT CHAR.
+  mov  al, [ di ]  ;CHAR TO DISPLAY.
+
+  cmp  al, 24H   ;IF CHAR == $
+
+  je   finish  ;THEN 0JUMP TO FINISH.
+
+  call char_display  ;DISPLAY CHAR IN AL WITH "COLOR".
+
+  inc  x  ;NEXT CHARACTER GOES TO THE RIGHT.
+
+  jmp  next_char
+
+  
+next_char:
+  inc  di  ;NEXT CHAR IN THE STRING
+  jmp  while2
+
+finish:
+call GetCursor
+inc  y  ;MOVE TO NEXT LINE.    
+mov  x, 5 ;X GOES TO THE LEFT.
+ret
+print endp 
+
+
+Drawingg2 proc FAR
+ 
+				; This piece of code was intended only for testing, so if you are using this grpahics mode for your project make sure you
+				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
+				; set up unlike the graphics mode we usually use...
+
+
+	       MOV AH,0Bh  
+		 	;set the configuration
+	       MOV CX, imgW2 	;set the width (X) up to image width (based on image resolution)
+	       MOV DX, imgH2 	;set the hieght (Y) up to image height (based on image resolution)
+	       mov DI, offset img2  ; to iterate over the pixels
+	       jmp Start2    	;Avoid drawing before the calculations
+	Drawit2:
+	
+	       MOV AH,0Ch   	;set the configuration to writing a pixel
+               mov al, [DI]     ; color of the current coordinates
+	       MOV BH,00h   	;set the page number
+	       INT 10h
+		   
+	 	;execute the configuration
+	Start2: 
+	       inc DI
+	       DEC Cx       	;  loop iteration in x direction
+	       JNZ Drawit2      	;  check if we can draw c urrent x and y and excape the y iteration
+	       mov Cx, imgW2 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+	       DEC DX       	;  loop iteration in y direction
+	       JZ  ENDING2  	;  both x and y reached 00 so end program
+	       Jmp Drawit2
+
+	ENDING2:
+	Ret
+
+Drawingg2 endp
+
+
+
+
+DrawingWin proc far
+
+
+call Drawingg2
+
+mov di, offset winmes   
+call print          ;printing asking for the players name delete after moving player's name
+
+mov ah,0ah         
+mov dx,offset PlayerName ;Storing the player's name in playername
+int 21h       ;The Player's name is already taken in the main menu you just have to get the winner & move it in PlayerName
+              ;E3mlha move ya Fathy!!! w ems7  mov di, offset winmes & call print ele fo2 dol w bs kda
+
+
+call drawingg2
+
+
+
+mov y,8 ;Setting X,Y Positions
+mov x,5
+mov di, offset PlayerName ;Outputing player's name
+call print 
+dec y ;Resitting to the same line of the name 
+mov x,dl ;Getting the last cursor of X
+mov di, offset Pt2 ;Outputting the "Has Won the MATCH!" message
+call print ;Printing function!
+
+
+
+DrawingWin endp
+
+
+
+
+
+
 ;-------------------------------------------------
 ;----------------------FEED SNAKE FUNC--------------            ; this works by telling advance snake function not to delete tail next time snake moves
 ;-------------------------------------------------
@@ -6306,6 +6460,11 @@ snake1head:
         jnz advance_not_frz
         mov Freeze_active,1
         mov Freeze_S1,1
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_ice
+        call print
+        
         ; FATHY here snake 1 ate the freeze do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -6315,6 +6474,11 @@ snake1head:
         jnz advance_not_poison
         mov poison_active_1,1
         mov poison_s1,1
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_poison
+        call print
+        
         ; FATHY here snake 1 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -6333,6 +6497,11 @@ snake1head:
 
         advance_dth:
         sub [score1+1],5
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_scoredec
+        call print
+        
         ; FATHY here snake 1 ate the death do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -6348,6 +6517,11 @@ snake1head:
 
         advance_kil:
        add [score1+1],5
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_scoreinc
+        call print
+
         ; FATHY here snake 1 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance_safe
@@ -6374,24 +6548,40 @@ snake1head:
                 jnz Poison
                 mov Freeze_active,1
                 mov Freeze_S1,1
-        
+                mov y,2
+                mov x,10  ;Setting X,Y position of the text
+                mov di, offset statues1_ice
+                call print
+
 
         Poison:
         cmp dl,1
         jnz Kill
         mov poison_active_1,1
         mov poison_s1,1
-       
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_poison
+        call print
+
        Kill:
         cmp dl,2
         jnz Death
         add [score1+1],5
-      
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_scoreinc
+        call print
+
         Death:
         cmp dl,3
         jnz advance
         sub [score1+1],5
-      
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues1_scoredec
+        call print
+
        
         ; FATHY here snake 1 ate the Rnd do your thing
      advance: 
@@ -6626,6 +6816,11 @@ snake2Head:
         jnz advance2_not_frz
         mov Freeze_S2,1
         mov Freeze_active,1
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_ice
+        call print
+
         ; FATHY here snake 2 ate the freeze do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -6635,6 +6830,11 @@ snake2Head:
         jnz advance2_not_poison
         mov poison_active_2,1
         mov poison_s2,1
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_poison
+        call print
+
         ; FATHY here snake 2 ate the poison do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -6653,8 +6853,12 @@ snake2Head:
 
         advance2_dth:
         ; FATHY here snake 2 ate the death do your thing
-         sub [score2+1],5
-      
+        sub [score2+1],5
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_scoredec
+        call print
+
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
 
@@ -6668,7 +6872,12 @@ snake2Head:
         jmp advance2_not_kil
 
         advance2_kil:
-         add [score2+1],5
+        add [score2+1],5
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_scoreinc
+        call print
+
       ; FATHY here snake 2 ate the KILL do your thing
         call draw_pwr           ; generate 2nd power       
         jmp advance2_safe
@@ -6695,6 +6904,10 @@ snake2Head:
                 jnz Poison2
                 mov Freeze_active,1
                 mov Freeze_S2,1
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_ice
+        call print
         
 
         Poison2:
@@ -6702,17 +6915,30 @@ snake2Head:
         jnz Kill2
         mov poison_active_2,1
         mov poison_s2,1
-       
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_poison
+        call print
+        
+
        Kill2:
         cmp dl,2
         jnz Death2
         add [score2+1],5
-      
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_scoreinc
+        call print
+        
         Death2:
         cmp dl,3
         jnz advance2
-         sub [score2+1],5
-      
+        sub [score2+1],5
+        mov y,2
+        mov x,10  ;Setting X,Y position of the text
+        mov di, offset statues2_scoredec
+        call print
+        
        
      advance2: 
            ; FATHY here snake 2 ate the Rnd do your thing
@@ -6854,137 +7080,6 @@ advance_shift2:
 advance_end:              
                 RET
 advancesnakes           ENDP
-
-;winning
-
-GetCursor proc far
-
-mov ah,3h
-mov bh,0h    ;Gets the most recent cursor position 
-int 10h
-
-ret
-GetCursor endp
-
-char_display proc far
-  mov  ah, 9
-  mov  bh, 0
-  mov  bl, color  ;ANY COLOR.
-  mov  cx, 1  ;HOW MANY TIMES TO DISPLAY CHAR.
-  int  10h
-  ret
-char_display endp    
-
- gotoxy proc far
-  mov dl, x
-  mov dh, y
-  mov ah, 2 ;SERVICE TO SET CURSOR POSITION.
-  mov bh, 0 ;PAGE.
-  int 10h   ;BIOS SCREEN SERVICES.  
-  ret
-gotoxy endp
-
-print proc far
-while2:      
-
-  call gotoxy  ;SET CURSOR POSITION FOR CURRENT CHAR.
-  mov  al, [ di ]  ;CHAR TO DISPLAY.
-
-  cmp  al, 24H   ;IF CHAR == $
-
-  je   finish  ;THEN 0JUMP TO FINISH.
-
-  call char_display  ;DISPLAY CHAR IN AL WITH "COLOR".
-
-  inc  x  ;NEXT CHARACTER GOES TO THE RIGHT.
-
-  jmp  next_char
-
-  
-next_char:
-  inc  di  ;NEXT CHAR IN THE STRING
-  jmp  while2
-
-finish:
-call GetCursor
-inc  y  ;MOVE TO NEXT LINE.    
-mov  x, 5 ;X GOES TO THE LEFT.
-ret
-print endp 
-
-
-Drawingg2 proc FAR
- 
-				; This piece of code was intended only for testing, so if you are using this grpahics mode for your project make sure you
-				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
-				; set up unlike the graphics mode we usually use...
-
-
-	       MOV AH,0Bh  
-		 	;set the configuration
-	       MOV CX, imgW2 	;set the width (X) up to image width (based on image resolution)
-	       MOV DX, imgH2 	;set the hieght (Y) up to image height (based on image resolution)
-	       mov DI, offset img2  ; to iterate over the pixels
-	       jmp Start2    	;Avoid drawing before the calculations
-	Drawit2:
-	
-	       MOV AH,0Ch   	;set the configuration to writing a pixel
-               mov al, [DI]     ; color of the current coordinates
-	       MOV BH,00h   	;set the page number
-	       INT 10h
-		   
-	 	;execute the configuration
-	Start2: 
-	       inc DI
-	       DEC Cx       	;  loop iteration in x direction
-	       JNZ Drawit2      	;  check if we can draw c urrent x and y and excape the y iteration
-	       mov Cx, imgW2 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
-	       DEC DX       	;  loop iteration in y direction
-	       JZ  ENDING2  	;  both x and y reached 00 so end program
-	       Jmp Drawit2
-
-	ENDING2:
-	Ret
-
-Drawingg2 endp
-
-
-
-
-DrawingWin proc far
-
-
-call Drawingg2
-
-mov di, offset winmes   
-call print          ;printing asking for the players name delete after moving player's name
-
-mov ah,0ah         
-mov dx,offset PlayerName ;Storing the player's name in playername
-int 21h       ;The Player's name is already taken in the main menu you just have to get the winner & move it in PlayerName
-              ;E3mlha move ya Fathy!!! w ems7  mov di, offset winmes & call print ele fo2 dol w bs kda
-
-
-call drawingg2
-
-
-
-mov y,8 ;Setting X,Y Positions
-mov x,5
-mov di, offset PlayerName ;Outputing player's name
-call print 
-dec y ;Resitting to the same line of the name 
-mov x,dl ;Getting the last cursor of X
-mov di, offset Pt2 ;Outputting the "Has Won the MATCH!" message
-call print ;Printing function!
-
-
-
-DrawingWin endp
-
-
-
-
 
 ;-------------------------------------------------
 ;----------------------send char in bl--------------
@@ -7192,6 +7287,7 @@ MAIN    PROC FAR
 mov ax,imgimg3
 mov ds,ax
 assume ds:imgimg3
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
@@ -7241,11 +7337,6 @@ assume ds:imgimgl
 call drawinggl
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;       
-        MOV AX,@DATA
-        MOV DS,AX  
-        assume ds:@data
-
 Again2:
 mov ah,0
 int 16h ;Get Key Pressed from the user ASCII is saved in AL
@@ -7260,11 +7351,12 @@ jmp Again2 ;Loop if the user doesn't choose the correct button
 
 
 I:
-mov level,1
+inc level
+
 jmp game
 
 K:
-mov level,2
+add level,2
 jmp game
 
 C1:  ;If the player presses on C to chat
@@ -7303,12 +7395,13 @@ mov di, offset P1  ;Print colored text
 call print
 
 mov y,0
-mov x,12  ;Setting X,Y position of the text
+mov x,24  ;Setting X,Y position of the text
 mov di, offset P2
 call print
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
+
         CALL init       
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -7320,16 +7413,36 @@ jmp secondary
 L1:
        Score1_L1:
         cmp [score1+1],58
-        jnz Score2_L1
+        jL Score1_L1_2
         inc [score1]
-        mov [score1+1],48
+        sub [score1+1],10
+       
+       Score1_L1_2:
+        cmp [score1+1],48
+        jGE Score2_L1
+        cmp [score1],48
+        Je Win2
+        dec [score1]
+        add [score1+1],10
        
        
+
        Score2_L1:
         cmp [score2+1],58
-        jnz printscoreL1
+        jL Score2_L1_2
         inc [score2]
-        mov [score2+1],48
+        sub [score2+1],10
+       Score2_L1_2:
+        cmp [score2+1],48
+        jGE printscoreL1
+        cmp [score2],48
+        Je Win2
+        dec [score2]
+        add [score2+1],10
+        jmp printscoreL1
+
+win2:
+jmp Win
         ;print score
        printscoreL1:
         mov y,0
@@ -7338,18 +7451,17 @@ L1:
         call print
 
         mov y,0
-        mov x,20  ;Setting X,Y position of the text
+        mov x,32  ;Setting X,Y position of the text
         mov di, offset Score2
         call print
 
-       
+     
        
        
         ; CALL feedsnake
         ; check the level
 
-
-        cmp level,2
+        cmp [level],2
         je Level2
         
         Level1:
@@ -8190,11 +8302,11 @@ jmp ggggg
         sub dx,4
 
 Win:
-        mov ax,0600
-        mov bh,71
-        mov cx,0
-        mov dx,184FH ;Clear Screen 
-        int 10h 
+        mov ax,@DATA
+mov ds,ax
+assume ds:@DATA
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
         int 10h 

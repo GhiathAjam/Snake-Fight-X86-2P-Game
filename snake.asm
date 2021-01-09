@@ -4884,8 +4884,6 @@ s_pwr_Y               dw      100d
 ;-------------------------------------------------------------------------------------------------
 ;----------------------IMAGEs STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
-
-
 imgWw equ 320
 imgHh equ 200
 imgWl equ 320
@@ -7194,7 +7192,6 @@ MAIN    PROC FAR
 mov ax,imgimg3
 mov ds,ax
 assume ds:imgimg3
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
@@ -7243,6 +7240,11 @@ assume ds:imgimgl
 
 call drawinggl
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;       
+        MOV AX,@DATA
+        MOV DS,AX  
+        assume ds:@data
 
 Again2:
 mov ah,0
@@ -7307,7 +7309,6 @@ call print
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
-
         CALL init       
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

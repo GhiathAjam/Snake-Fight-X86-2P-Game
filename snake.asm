@@ -1608,7 +1608,8 @@ img2 DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 20
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  
-playername2 db "Player1","$"
+playername1 db "Player1","$"
+playername2 db "Player2","$"
 pt2 db ' Has Won the Match!','$'
 
 imgimg ENDS
@@ -4856,7 +4857,7 @@ PlayerName db 'Player1','$'
 M db 30,?,30 dup('$')
 
 is_2p           db      1
-is_main         db      0
+is_main         db      1
 s1h_img         Dw      ?
 s2h_img         Dw      ?
 
@@ -6261,9 +6262,6 @@ Drawingg2 proc FAR
 				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
 				; set up unlike the graphics mode we usually use...
 
-                mov ax,imgimg
-                mov ds,ax
-                assume ds:imgimg
 
 	       MOV AH,0Bh  
 		 	;set the configuration
@@ -6289,9 +6287,7 @@ Drawingg2 proc FAR
 	       Jmp Drawit2
 
 	ENDING2:
-                mov ax,@DATA
-                mov ds,ax
-                assume ds:@DATA
+            
 	Ret
 
 Drawingg2 endp
@@ -6299,7 +6295,30 @@ Drawingg2 endp
 
 
 
-DrawingWin proc far
+DrawingWin1 proc far
+
+
+call Drawingg2
+
+mov y,8 ;Setting X,Y Positions
+mov x,5
+mov di, offset PlayerName1 ;Outputing player's name
+call print 
+dec y ;Resitting to the same line of the name 
+mov x,dl ;Getting the last cursor of X
+mov di, offset Pt2 ;Outputting the "Has Won the MATCH!" message
+call print ;Printing function!
+
+MOV CX, 30H		;cx:dx is used as a register of the time in microsec.
+MOV DX, 2050H
+MOV AH, 86H	
+INT 15H			;delay interrupt int 15h / ah = 86h
+        
+ret
+DrawingWin1 endp
+
+
+DrawingWin2 proc far
 
 
 call Drawingg2
@@ -6313,14 +6332,13 @@ mov x,dl ;Getting the last cursor of X
 mov di, offset Pt2 ;Outputting the "Has Won the MATCH!" message
 call print ;Printing function!
 
-MOV CX, 10H		;cx:dx is used as a register of the time in microsec.
+MOV CX, 30H		;cx:dx is used as a register of the time in microsec.
 MOV DX, 2050H
 MOV AH, 86H	
 INT 15H			;delay interrupt int 15h / ah = 86h
         
-
-DrawingWin endp
-
+ret
+DrawingWin2 endp
 
 
 
@@ -6426,17 +6444,17 @@ snake1head:
         advance_not_food:        
         cmp al,0Fh
         jnz advance_not_border
-        jmp advance_snake2
+        jmp Win2
 
         advance_not_border:
         cmp al,28h
         jnz advance_not_self
-        jmp advance_snake2
+        jmp Win2
 
         advance_not_self:
         cmp al,035H
         jnz advance_not_other
-        jmp advance_snake2
+        jmp Win2
 
         advance_safef:
         jmp advance_safe     
@@ -6449,7 +6467,7 @@ snake1head:
         jmp advance_not_obstacle
 
         advance_obstacle:
-        jmp advance_snake2
+        jmp Win2
 
         advance_not_obstacle: 
         cmp al,04eh
@@ -6790,12 +6808,12 @@ snake2Head:
         advance2_not_food:
         cmp al,0Fh
         jnz advance2_not_border
-        jmp advance_end
+        jmp Win1
         
         advance2_not_border:
         cmp al,035h
         jnz advance2_not_self
-        jmp advance_end
+        jmp Win1
         
         advance2_not_self:
         cmp al,28h
@@ -6813,7 +6831,7 @@ snake2Head:
         jmp advance2_not_obstacle
 
         advance2_obstacle:
-        jmp advance_end
+        jmp Win1
 
         advance2_not_obstacle:              
         cmp al,04eh
@@ -7358,11 +7376,17 @@ jmp Again2 ;Loop if the user doesn't choose the correct button
 
 
 I:
+    mov ax,@DATA
+                mov ds,ax
+                assume ds:@DATA
 inc level
 
 jmp game
 
 K:
+    mov ax,@DATA
+                mov ds,ax
+                assume ds:@DATA
 add level,2
 jmp game
 
@@ -7407,6 +7431,10 @@ call print
 
         CALL init       
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+mov [score1],48
+mov [score1+1],48
+mov [score2],48
+mov [score2+1],48
 
 cmp is_main,1
 jz L1
@@ -7422,12 +7450,17 @@ L1:
        
        Score1_L1_2:
         cmp [score1+1],48
-        jGE Score2_L1
+        jGE Score1_L1_3
         cmp [score1],48
-        Je Win2
+        Je Win_2
         dec [score1]
         add [score1+1],10
        
+       Score1_L1_3:
+        cmp [score1+1],51
+        jL Score2_L1
+        jmp Win1
+
        Score2_L1:
         cmp [score2+1],58
         jL Score2_L1_2
@@ -7435,15 +7468,22 @@ L1:
         sub [score2+1],10
        Score2_L1_2:
         cmp [score2+1],48
-        jGE printscoreL1
+        jGE Score2_L1_3
         cmp [score2],48
-        Je Win2
+        Je Win_1
         dec [score2]
         add [score2+1],10
         jmp printscoreL1
 
-win2:
-jmp Win
+Score2_L1_3:
+        cmp [score2+1],51
+        jl printscoreL1
+        jmp win2
+win_1:
+jmp Win1
+
+win_2:
+jmp Win2
         ;print score
        printscoreL1:
         mov y,0
@@ -7466,8 +7506,8 @@ jmp Win
         je Level2
         
         Level1:
-        MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
-        MOV DX, 2050H
+        MOV CX, 02H		;cx:dx is used as a register of the time in microsec.
+        MOV DX, 1300H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
         jmp Freeze_1		
@@ -7947,11 +7987,11 @@ L1Ff: jmp L1
 
 WinCHK1:
         mov dx,1
-        jmp Win
+        jmp Win1
 
 WinCHK2:
         mov dx,2 
-        jmp Win
+        jmp Win2
 
 secondary:
 
@@ -8315,7 +8355,7 @@ jmp ggggg
         sub cx,4
         sub dx,4
 
-Win:
+Win1:
         mov ax,imgimg
         mov ds,ax
         assume ds:imgimg
@@ -8324,7 +8364,20 @@ Win:
         mov ah,0                       
         mov al,13h
         int 10h 
-        call DrawingWin
+        call DrawingWin1
+        jmp MAIN
+
+
+Win2:
+        mov ax,imgimg
+        mov ds,ax
+        assume ds:imgimg
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
+        mov ah,0                       
+        mov al,13h
+        int 10h 
+        call DrawingWin2
         jmp MAIN
 
 

@@ -4853,8 +4853,8 @@ pt2 db ' Has Won the Match!','$'
 PlayerName db 30,?,30 dup('$')
 M db 30,?,30 dup('$')
 
-is_2p           db      0
-is_main         db      1
+is_2p           db      1
+is_main         db      0
 s1h_img         Dw      ?
 s2h_img         Dw      ?
 
@@ -5242,21 +5242,21 @@ imgW    Db      ?
 ;----------------------SCORE AND LEVELS STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
 
-level dw 0
-P1 db 'Player1:','$'
-P2 db 'Player2:','$'
-Score1 db 48,48,'$'
-Score2 db 48,48,'$'
-statues1_poison db "Player1 ate poison ",'$'
-statues1_ice db "Player2 has been freezed",'$'
-statues1_scoreinc db "Player1 inc 5 score",'$'
-statues1_scoredec db "Player1 dec 5 score",'$'
-statues2_poison db "Player2 ate poison ",'$'
-statues2_ice db "Player1 has been freezed",'$'
-statues2_scoreinc db "Player2 inc 5 score",'$'
-statues2_scoredec db "Player2 dec 5 score",'$'
-
-
+level                   dw      0
+P1                      db      'Player1:','$'
+P2                      db      'Player2:','$'
+Score1                  db      48,48,'$'
+Score2                  db      48,48,'$'
+statues1_poison         db      "Player1 ate poison ",'$'
+statues1_ice            db      "Player2 has been freezed",'$'
+statues1_scoreinc       db      "Player1 inc 5 score",'$'
+statues1_scoredec       db      "Player1 dec 5 score",'$'
+statues2_poison         db      "Player2 ate poison ",'$'
+statues2_ice            db      "Player1 has been freezed",'$'
+statues2_scoreinc       db      "Player2 inc 5 score",'$'
+statues2_scoredec       db      "Player2 dec 5 score",'$'
+curr_statues            Dw      ?
+emptymsg                db      '$','$'
 ;
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SNAKE STUFF----------------------------------
@@ -6150,12 +6150,9 @@ init_draws2:
                 jnz init_draws2
 
                 ; initializing sending stuff
-                lea ax,Img_S1_H_L
-                mov s1h_img,ax
-
-                lea ax,Img_S2_H_R
-                mov s2h_img,ax
-
+                mov s1h_img,offset Img_S1_H_L
+                mov s2h_img,offset Img_S2_H_R
+                mov curr_statues,offset emptymsg
 
                 ; � Set Divisor Latch Access Bit
                 mov dx,3fbh ; Line Control Register
@@ -6262,6 +6259,9 @@ Drawingg2 proc FAR
 				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
 				; set up unlike the graphics mode we usually use...
 
+                mov ax,imgimg
+                mov ds,ax
+                assume ds:imgimg
 
 	       MOV AH,0Bh  
 		 	;set the configuration
@@ -6287,6 +6287,9 @@ Drawingg2 proc FAR
 	       Jmp Drawit2
 
 	ENDING2:
+                mov ax,@DATA
+                mov ds,ax
+                assume ds:@DATA
 	Ret
 
 Drawingg2 endp
@@ -6302,9 +6305,12 @@ call Drawingg2
 mov di, offset winmes   
 call print          ;printing asking for the players name delete after moving player's name
 
+mov di, si
+call print          ;printing asking for the players name delete after moving player's name
+
 mov ah,0ah         
 mov dx,offset PlayerName ;Storing the player's name in playername
-int 21h       ;The Player's name is already taken in the main menu you just have to get the winner & move it in PlayerName
+; int 21h       ;The Player's name is already taken in the main menu you just have to get the winner & move it in PlayerName
               ;E3mlha move ya Fathy!!! w ems7  mov di, offset winmes & call print ele fo2 dol w bs kda
 
 
@@ -6314,7 +6320,7 @@ call drawingg2
 
 mov y,8 ;Setting X,Y Positions
 mov x,5
-mov di, offset PlayerName ;Outputing player's name
+mov di, si ;Outputing player's name
 call print 
 dec y ;Resitting to the same line of the name 
 mov x,dl ;Getting the last cursor of X
@@ -6463,6 +6469,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_ice
+        mov curr_statues,di
         call print
         
         ; FATHY here snake 1 ate the freeze do your thing
@@ -6477,6 +6484,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_poison
+        mov curr_statues,di
         call print
         
         ; FATHY here snake 1 ate the poison do your thing
@@ -6500,6 +6508,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoredec
+        mov curr_statues,di
         call print
         
         ; FATHY here snake 1 ate the death do your thing
@@ -6520,6 +6529,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoreinc
+        mov curr_statues,di
         call print
 
         ; FATHY here snake 1 ate the KILL do your thing
@@ -6551,6 +6561,7 @@ snake1head:
                 mov y,2
                 mov x,10  ;Setting X,Y position of the text
                 mov di, offset statues1_ice
+                mov curr_statues,di
                 call print
 
 
@@ -6562,6 +6573,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_poison
+        mov curr_statues,di
         call print
 
        Kill:
@@ -6571,6 +6583,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoreinc
+        mov curr_statues,di
         call print
 
         Death:
@@ -6580,6 +6593,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoredec
+        mov curr_statues,di
         call print
 
        
@@ -6819,6 +6833,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_ice
+        mov curr_statues,di
         call print
 
         ; FATHY here snake 2 ate the freeze do your thing
@@ -6833,6 +6848,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_poison
+        mov curr_statues,di
         call print
 
         ; FATHY here snake 2 ate the poison do your thing
@@ -6857,6 +6873,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_scoredec
+        mov curr_statues,di
         call print
 
         call draw_pwr           ; generate 2nd power       
@@ -6876,6 +6893,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_scoreinc
+        mov curr_statues,di
         call print
 
       ; FATHY here snake 2 ate the KILL do your thing
@@ -6907,6 +6925,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_ice
+        mov curr_statues,di
         call print
         
 
@@ -6918,6 +6937,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_poison
+        mov curr_statues,di
         call print
         
 
@@ -6928,6 +6948,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_scoreinc
+        mov curr_statues,di
         call print
         
         Death2:
@@ -6937,6 +6958,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_scoredec
+        mov curr_statues,di
         call print
         
        
@@ -7174,6 +7196,9 @@ Drawingg proc FAR
 				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
 				; set up unlike the graphics mode we usually use...
 
+                mov ax,imgimg3
+                mov ds,ax
+                assume ds:imgimg3
 
 	       mov ax, 4F02h    ; This Graphics mode configuration uses SVGA configuration (https://en.wikipedia.org/wiki/Super_VGA)
 				; which was not even created when asm86 first came out. I use it to be able to use 256 colors on 640x400
@@ -7202,6 +7227,9 @@ Drawingg proc FAR
 		   Jmp Drawit
 
 	ENDING:
+                mov ax,@DATA
+                mov ds,ax
+                assume ds:@DATA
 	Ret
 
 Drawingg endp
@@ -7212,14 +7240,11 @@ Drawinggl proc FAR
  
 				
 
+                mov ax,imgimgl
+                mov ds,ax
+                assume ds:imgimgl
 
-	       mov ax, 4F02h    ; This Graphics mode configuration uses SVGA configuration (https://en.wikipedia.org/wiki/Super_VGA)
-				; which was not even created when asm86 first came out. I use it to be able to use 256 colors on 640x400
-				; it should work fine on tasm/masm extension for VSCode if your project does not use mouse clicks as controls
-	       mov bx, 0100h    
-	;        INT 10h      	;execute the configuration
 	       MOV AH,0Bh  
-		 	;set the configuration
 	       MOV CX, imgWl  	;set the width (X) up to image width (based on image resolution)
 	       MOV DX, imgHl 	;set the hieght (Y) up to image height (based on image resolution)
 	       mov DI, offset imgl  ; to iterate over the pixels
@@ -7240,6 +7265,9 @@ Drawinggl proc FAR
 		   Jmp Drawitl
 
 	ENDINGl:
+                mov ax,@DATA
+                mov ds,ax
+                assume ds:@DATA
 	Ret
 
 Drawinggl endp
@@ -7282,12 +7310,6 @@ MAIN    PROC FAR
         MOV AX,@DATA
         MOV DS,AX  
         mov ES,AX
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;       
-mov ax,imgimg3
-mov ds,ax
-assume ds:imgimg3
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
@@ -7328,11 +7350,6 @@ mov bh,00
 mov cx,0
 mov dx,184FH
 int 10h 
-
-mov ax,imgimgl
-mov ds,ax
-assume ds:imgimgl
-
 
 call drawinggl
 
@@ -7380,10 +7397,6 @@ int 10h
 
 
 Game:
-mov ax,@DATA
-mov ds,ax
-assume ds:@DATA
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
@@ -7425,8 +7438,6 @@ L1:
         dec [score1]
         add [score1+1],10
        
-       
-
        Score2_L1:
         cmp [score2+1],58
         jL Score2_L1_2
@@ -7811,10 +7822,15 @@ sssend:
                         mov bx,pwr_img
                         call SendWord
                 ; Send Scores
-
+                        mov bx,word ptr score1
+                        call SendWord
+                        mov bx,word ptr Score2
+                        call SendWord
                 ; Send Event
+                        mov bx,curr_statues
+                        call SendWord
 
-                ; RECIEVE INPUT FROM P2
+                ; RECIEVE INPUT FROM P2 And Process it
                         mov dx , 3FDH ; Line Status Register
                         in al , dx
                         and al , 1
@@ -7939,31 +7955,15 @@ no_sssend:
             
 L1Ff: jmp L1
 
+WinCHK1:
+        mov dx,1
+        jmp Win
 
+WinCHK2:
+        mov dx,2 
+        jmp Win
 
 secondary:
-
-        cmp [score1+1],58
-        jnz Score2_Sec
-        inc [score1]
-        mov [score1+1],48
-      
-      Score2_Sec:
-        cmp [score2+1],58
-        jnz printscore
-        inc [score2]
-        mov [score2+1],48
-        ;print score
-       printscore:
-        mov y,0
-        mov x,8      ;Setting X,Y position of the text.
-        mov di, offset Score1+1  ;Print colored text
-        call print
-
-        mov y,0
-        mov x,21  ;Setting X,Y position of the text
-        mov di, offset Score2
-        call print
 
         ;------------------------------------
         ;--------Recieve STUFF AS 2nd---------
@@ -7978,6 +7978,10 @@ secondary:
                         JZ bdsadax
                         mov dx , 03F8H
                         in al , dx
+                        cmp al,0FEH
+                        je WinCHK1
+                        cmp al,0FDH
+                        je WinCHK2
                         cmp al,0FFH
                         jnz Rec_Fr_Bgx
 
@@ -8076,8 +8080,13 @@ secondary:
                         call RecieveWord
                         mov pwr_img,bx
                 ; Recieve Scores
-
+                        call RecieveWord
+                        mov word ptr [Score1],bx
+                        call RecieveWord
+                        mov word ptr [Score2],bx
                 ; Recieve Event
+                        call RecieveWord
+                        mov curr_statues,bx
 
         ; GET INPUT AND SEND IT
                 mov bl,0FFH
@@ -8214,7 +8223,22 @@ secondary:
                         mov dx,s_pwr_y
                         mov di,pwr_img
                         call Draw_Image
+                ;Score
+                        mov y,0
+                        mov x,8     ;Setting X,Y position of the text.
+                        mov di, offset Score1  ;Print colored text
+                        call print
 
+                        mov y,0
+                        mov x,21  ;Setting X,Y position of the text
+                        mov di, offset Score2
+                        call print
+
+                ;Event
+                        mov y,2
+                        mov x,10  ;Setting X,Y position of the text
+                        mov di,curr_statues
+                        call print
                 ; set O values
                         mov bl,sz1
                         mov sz1o,bl
@@ -8302,15 +8326,22 @@ jmp ggggg
         sub dx,4
 
 Win:
-        mov ax,@DATA
-mov ds,ax
-assume ds:@DATA
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
         int 10h 
 
+        mov bl,0FEH
+
+        lea si,P1
+        cmp dx,1
+        je Win_draw               ; if dx has 1 then leave si pointing at P1 AND bl at 0FEH
+
+        lea si,P2               ; else make si point at P2  AND bl 0FDH
+        mov bl,0FDh
+
+        Win_draw:
+        call Sendchar
         jmp DrawingWin
 
 

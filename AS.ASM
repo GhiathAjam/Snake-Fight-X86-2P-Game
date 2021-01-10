@@ -8,10 +8,10 @@
 
 
 ;description
-imgimg SEGMENT USE16
+imgimg3 SEGMENT USE16
 
-imgW equ 320
-imgH equ 200
+imgWw equ 320
+imgHh equ 200
 img DB 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 24, 24, 25, 25, 25, 25, 25, 25, 24, 24, 25, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 25, 24, 24, 25, 25, 71, 71
  DB 25, 25, 25, 26, 71, 26, 26, 25, 25, 25, 24, 24, 24, 24, 25, 25, 25, 25, 25, 143, 2, 118, 2, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119
  DB 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 191, 191, 119, 119, 119, 119, 119, 2, 2, 2, 2, 2, 2, 2, 2, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 191, 191
@@ -1628,7 +1628,7 @@ img DB 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 24, 24, 25, 25, 25, 25, 2
 
 
 
-imgimg ENDS
+imgimg3 ENDS
 
 
 
@@ -3260,8 +3260,8 @@ Drawingg proc FAR
 	;        INT 10h      	;execute the configuration
 	       MOV AH,0Bh  
 		 	;set the configuration
-	       MOV CX, imgW  	;set the width (X) up to image width (based on image resolution)
-	       MOV DX, imgH 	;set the hieght (Y) up to image height (based on image resolution)
+	       MOV CX, imgWw	;set the width (X) up to image width (based on image resolution)
+	       MOV DX, imgHh 	;set the hieght (Y) up to image height (based on image resolution)
 	       mov DI, offset img  ; to iterate over the pixels
 	       jmp Start    	;Avoid drawing before the calculations
 	Drawit:
@@ -3274,7 +3274,7 @@ Drawingg proc FAR
 		   inc DI
 	       DEC Cx       	;  loop iteration in x direction
 	       JNZ Drawit      	;  check if we can draw c urrent x and y and excape the y iteration
-	       mov Cx, imgW 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+	       mov Cx, imgWw 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
 	       DEC DX       	;  loop iteration in y direction
 	       JZ  ENDING   	;  both x and y reached 00 so end program
 		   Jmp Drawit
@@ -3331,9 +3331,9 @@ Main proc far
 mov ax, @data
 mov DS, ax
 
-mov ax,imgimg
+mov ax,imgimg3
 mov ds,ax
-assume ds:imgimg
+assume ds:imgimg3
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       

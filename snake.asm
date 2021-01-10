@@ -1608,6 +1608,9 @@ img2 DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 20
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  DB 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201
  
+playername2 db "Player1","$"
+pt2 db ' Has Won the Match!','$'
+
 imgimg ENDS
 
 imgimg3 SEGMENT USE16
@@ -4849,8 +4852,7 @@ x db 4
 y db 8
 
 winmes db 'The winner is:','$'
-pt2 db ' Has Won the Match!','$'
-PlayerName db 30,?,30 dup('$')
+PlayerName db 'Player1','$'
 M db 30,?,30 dup('$')
 
 is_2p           db      1
@@ -6302,32 +6304,20 @@ DrawingWin proc far
 
 call Drawingg2
 
-mov di, offset winmes   
-call print          ;printing asking for the players name delete after moving player's name
-
-mov di, si
-call print          ;printing asking for the players name delete after moving player's name
-
-mov ah,0ah         
-mov dx,offset PlayerName ;Storing the player's name in playername
-; int 21h       ;The Player's name is already taken in the main menu you just have to get the winner & move it in PlayerName
-              ;E3mlha move ya Fathy!!! w ems7  mov di, offset winmes & call print ele fo2 dol w bs kda
-
-
-call drawingg2
-
-
-
 mov y,8 ;Setting X,Y Positions
 mov x,5
-mov di, si ;Outputing player's name
+mov di, offset PlayerName2 ;Outputing player's name
 call print 
 dec y ;Resitting to the same line of the name 
 mov x,dl ;Getting the last cursor of X
 mov di, offset Pt2 ;Outputting the "Has Won the MATCH!" message
 call print ;Printing function!
 
-
+MOV CX, 10H		;cx:dx is used as a register of the time in microsec.
+MOV DX, 2050H
+MOV AH, 86H	
+INT 15H			;delay interrupt int 15h / ah = 86h
+        
 
 DrawingWin endp
 
@@ -8326,23 +8316,16 @@ jmp ggggg
         sub dx,4
 
 Win:
+        mov ax,imgimg
+        mov ds,ax
+        assume ds:imgimg
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
         mov al,13h
         int 10h 
-
-        mov bl,0FEH
-
-        lea si,P1
-        cmp dx,1
-        je Win_draw               ; if dx has 1 then leave si pointing at P1 AND bl at 0FEH
-
-        lea si,P2               ; else make si point at P2  AND bl 0FDH
-        mov bl,0FDh
-
-        Win_draw:
-        call Sendchar
-        jmp DrawingWin
+        call DrawingWin
+        jmp MAIN
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

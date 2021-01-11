@@ -5272,6 +5272,7 @@ imgW    Db      ?
         statues2_scoredec       db      "Player2 dec 5 score",'$'
         statues_empty_hh        db      25 dup(' '),'$'
         curr_statues            Dw      ?
+        curr_s_p                db      ?
         emptymsg                db      '$','$'
 ;
 ;-------------------------------------------------------------------------------------------------
@@ -5719,7 +5720,6 @@ smallchat PROC  FAR
     mov senderCursorX, dl
     mov senderCursorY, dh
     mov senderBeginningX, dl
-    inc senderBeginningX
     mov senderBeginningY, dh
 ;set the cursor at the half of the screen
 	mov ah, 02h
@@ -5738,7 +5738,6 @@ smallchat PROC  FAR
     mov receiverCursorX, dl
     mov receiverCursorY, dh
     mov receiverBeginningX, dl
-    inc receiverBeginningX
     mov receiverBeginningY, dh
 ; change cursor again to the sender position
 	mov dl, senderCursorX
@@ -5926,6 +5925,14 @@ S_Receive:
 S_ENDING:
         mov bl,0
         call Sendchar
+        ; delete the page first
+	mov ah, 06h
+	mov al, 0
+	mov bh, 0h
+	mov cx, 0001h
+	mov dl, 38
+	mov dh, 01
+	int 10h
         RET
 smallchat ENDP
 ;-------------------------------------------------
@@ -6798,7 +6805,7 @@ INIT                   ENDP
 
 
 ;-------------------------------------------------
-;----------------------Printing--------------            ; this works by telling advance snake function not to delete tail next time snake moves
+;----------------------Printing--------------           
 ;-------------------------------------------------
 
 
@@ -8111,18 +8118,20 @@ ESCAPEx:jmp ESCAPE
 
                 mov is_2p,1
                 mov is_main,0
+                rec_lvl:
                 call RecieveChar
                 CMP bl,17h
                 JnE not_I ;If player press i go to label I:
                 jmp I
 
                 not_I:
-                jmp k
 
                 CMP bl,25h
-                ; JE K ;if player press K go to label K
+                JnE Kz ;if player press K go to label K
+                jmp k
 
-                jmp MAIN
+                Kz:
+                jmp rec_lvl
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -8306,6 +8315,14 @@ jmp Win2
         mov bl,0FCH
         call Sendchar
         call smallchat
+        mov y,0
+        mov x,1      ;Setting X,Y position of the text.
+        mov di, offset NameP1  ;Print colored text
+        call print
+        mov y,0
+        mov x,24  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
         jmp FF1
 
         UP:    
@@ -8606,6 +8623,8 @@ sssend:
                 ; Send Event
                         mov bx,curr_statues
                         call SendWord
+                        mov bl,curr_s_p
+                        call Sendchar
 
                 ; RECIEVE INPUT FROM P2 And Process it
                         mov dx , 3FDH ; Line Status Register
@@ -8642,6 +8661,14 @@ sssend:
                         mov bl,0FCH
                         call Sendchar
                         call smallchat
+                        mov y,0
+                        mov x,1      ;Setting X,Y position of the text.
+                        mov di, offset NameP1  ;Print colored text
+                        call print
+                        mov y,0
+                        mov x,24  ;Setting X,Y position of the text
+                        mov di, offset NameP2
+                        call print
                         jmp s_FF1
 
 
@@ -8679,7 +8706,7 @@ sssend:
                         jmp s_FF1
                         s_Right2_Poison:
                         cmp DirS2 , 2      
-                        je s_FFF1   
+                        je s_FF1   
                         mov DirS2,0
                         dec Num_Of_Times_2
                         cmp Num_Of_Times_2,0
@@ -8743,6 +8770,14 @@ L1Ff: jmp L1
 
 s_in_chat:
         call smallchat
+        mov y,0
+        mov x,1      ;Setting X,Y position of the text.
+        mov di, offset NameP1  ;Print colored text
+        call print
+        mov y,0
+        mov x,24  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
         jmp secondary
 WinCHK1:
         mov dx,1
@@ -8878,7 +8913,8 @@ secondary:
                 ; Recieve Event
                         call RecieveWord
                         mov curr_statues,bx
-
+                        call RecieveChar
+                        mov curr_s_p,bl
         ; GET INPUT AND SEND IT
                 mov bl,0FFH
                 mov ah,01

@@ -5262,17 +5262,17 @@ imgW    Db      ?
         level                   dw      0
         Score1                  db      48,48,'$'
         Score2                  db      48,48,'$'
-        statues1_poison         db      " ate poison ",'$'
+        statues1_poison         db      " ate poison    ",'$'
         statues1_ice            db      " has been freezed",'$'
-        statues1_scoreinc       db      " inc 5 score",'$'
-        statues1_scoredec       db      " dec 5 score",'$'
-        statues2_poison         db      " ate poison ",'$'
+        statues1_scoreinc       db      " inc 5 score   ",'$'
+        statues1_scoredec       db      " dec 5 score   ",'$'
+        statues2_poison         db      " ate poison    ",'$'
         statues2_ice            db      " has been freezed",'$'
-        statues2_scoreinc       db      " inc 5 score",'$'
-        statues2_scoredec       db      " dec 5 score",'$'
+        statues2_scoreinc       db      " inc 5 score   ",'$'
+        statues2_scoredec       db      " dec 5 score   ",'$'
         statues_empty_hh        db      25 dup(' '),'$'
         curr_statues            Dw      ?
-        curr_s_p                db      ?
+        curr_s_p                dW      ?
         emptymsg                db      '$','$'
 ;
 ;-------------------------------------------------------------------------------------------------
@@ -6769,6 +6769,8 @@ init_draws2:
                 mov s1h_img,offset Img_S1_H_L
                 mov s2h_img,offset Img_S2_H_R
                 mov curr_statues,offset emptymsg
+                mov di,offset emptymsg
+                mov curr_s_p,di
 
                 ; � Set Divisor Latch Access Bit
                 mov dx,3fbh ; Line Control Register
@@ -7101,11 +7103,13 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_ice
         mov curr_statues,di
+        mov curr_s_p,di
         call print
         
         ; FATHY here snake 1 ate the freeze do your thing
@@ -7121,6 +7125,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7150,6 +7155,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7176,6 +7182,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7213,6 +7220,7 @@ snake1head:
                 mov y,2
                 mov x,10  ;Setting X,Y position of the text
                mov di, offset NameP2
+        mov curr_s_p,di
                 call print
                 mov y,2
                  mov x,20  ;Setting X,Y position of the text
@@ -7230,6 +7238,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7245,6 +7254,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7260,6 +7270,7 @@ snake1head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7505,6 +7516,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7525,6 +7537,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7555,6 +7568,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7580,6 +7594,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7617,6 +7632,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP1
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7634,6 +7650,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7650,6 +7667,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -7665,6 +7683,7 @@ snake2Head:
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset NameP2
+        mov curr_s_p,di
         call print
         mov y,2
         mov x,20  ;Setting X,Y position of the text
@@ -8230,6 +8249,8 @@ mov poison_active_1,0
 mov poison_active_2,0
 mov Freeze_active,0
 mov curr_statues,offset emptymsg
+mov curr_s_p,offset emptymsg
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
         CALL init       
@@ -8687,8 +8708,8 @@ sssend:
                 ; Send Event
                         mov bx,curr_statues
                         call SendWord
-                        mov bl,curr_s_p
-                        call Sendchar
+                        mov bx,curr_s_p
+                        call SendWord
 
                 ; RECIEVE INPUT FROM P2 And Process it
                         mov dx , 3FDH ; Line Status Register
@@ -8977,8 +8998,8 @@ secondary:
                 ; Recieve Event
                         call RecieveWord
                         mov curr_statues,bx
-                        call RecieveChar
-                        mov curr_s_p,bl
+                        call RecieveWord
+                        mov curr_s_p,bx
         ; GET INPUT AND SEND IT
                 mov bl,0FFH
                 mov ah,01
@@ -9127,8 +9148,23 @@ secondary:
 
                 ;Event
                         call ClearScreenStatues
+                        mov di,curr_s_p
+                        cmp di,offset emptymsg
+                        je zzzzzzzzzz
+                        cmp di,offset NameP1
+                        je ppp2
+                        mov di,offset Namep1
+                        jmp zzzzzzzzzz
+
+                        ppp2:
+                        mov di,offset NameP2
+
+                        zzzzzzzzzz:
                         mov y,2
                         mov x,10  ;Setting X,Y position of the text
+                        call print 
+                        mov y,2
+                        mov x,20  ;Setting X,Y position of the text
                         mov di,curr_statues
                         call print
                 ; set O values

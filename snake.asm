@@ -7943,7 +7943,7 @@ MAIN   PROC FAR
 
 ;[[[
 CMP Z,1
-Jmp Skip5
+JnE Skip5
 
 ; Taking Name
         mov x,5

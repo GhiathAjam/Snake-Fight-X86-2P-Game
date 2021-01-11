@@ -4856,7 +4856,7 @@ winmes db 'The winner is:','$'
 PlayerName db 'Player1','$'
 M db 30,?,30 dup('$')
 
-is_2p           db      1
+is_2p           db      0
 is_main         db      1
 s1h_img         Dw      ?
 s2h_img         Dw      ?
@@ -5238,8 +5238,6 @@ imgW    Db      ?
         pwr_X           DW ?
         pwr_Y           DW ?
         frst            DW 1
-
-        
 
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SCORE AND LEVELS STUFF----------------------------------
@@ -6341,6 +6339,27 @@ ret
 DrawingWin2 endp
 
 
+ClearScreenStatues:
+               MOV CX, 320h  	;set the width (X) up to image width (based on image resolution)
+	       MOV DX, 15h 	;set the hieght (Y) up to image height (based on image resolution)
+	       jmp Startl22    	;Avoid drawing before the calculations
+	Drawitl22:
+	
+	       MOV AH,0Ch   	;set the configuration to writing a pixel
+               mov al,0000b     ; color of the current coordinates
+	       MOV BH,00h   	;set the page number
+	       INT 10h
+		   Startl22:
+		   
+	       DEC Cx       	;  loop iteration in x direction
+	       JNZ Drawitl22      	;  check if we can draw c urrent x and y and excape the y iteration
+	       mov Cx, 320h 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+	       DEC DX       	;  loop iteration in y direction
+	       JZ  ENDINGl22  	;  both x and y reached 00 so end program
+		   Jmp Drawitl22
+
+	ENDINGl22:
+	Ret
 
 
 
@@ -6474,6 +6493,7 @@ snake1head:
         jnz advance_not_frz
         mov Freeze_active,1
         mov Freeze_S1,1
+        call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_ice
@@ -6489,6 +6509,7 @@ snake1head:
         jnz advance_not_poison
         mov poison_active_1,1
         mov poison_s1,1
+        call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_poison
@@ -6513,6 +6534,7 @@ snake1head:
 
         advance_dth:
         sub [score1+1],5
+        call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoredec
@@ -6534,6 +6556,7 @@ snake1head:
 
         advance_kil:
        add [score1+1],5
+        call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues1_scoreinc
@@ -6564,6 +6587,7 @@ snake1head:
                 Freeze:
                 cmp dl,0
                 jnz Poison
+                call ClearScreenStatues
                 mov Freeze_active,1
                 mov Freeze_S1,1
                 mov y,2
@@ -6576,6 +6600,7 @@ snake1head:
         Poison:
         cmp dl,1
         jnz Kill
+        call ClearScreenStatues
         mov poison_active_1,1
         mov poison_s1,1
         mov y,2
@@ -6587,6 +6612,7 @@ snake1head:
        Kill:
         cmp dl,2
         jnz Death
+        call ClearScreenStatues
         add [score1+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
@@ -6597,6 +6623,7 @@ snake1head:
         Death:
         cmp dl,3
         jnz advance
+        call ClearScreenStatues
         sub [score1+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
@@ -6836,6 +6863,7 @@ snake2Head:
         advance2_not_obstacle:              
         cmp al,04eh
         jnz advance2_not_frz
+        call ClearScreenStatues
         mov Freeze_S2,1
         mov Freeze_active,1
         mov y,2
@@ -6851,6 +6879,7 @@ snake2Head:
         advance2_not_frz:
         cmp al,01ch
         jnz advance2_not_poison
+        call ClearScreenStatues
         mov poison_active_2,1
         mov poison_s2,1
         mov y,2
@@ -6877,6 +6906,7 @@ snake2Head:
 
         advance2_dth:
         ; FATHY here snake 2 ate the death do your thing
+        call ClearScreenStatues
         sub [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
@@ -6898,6 +6928,7 @@ snake2Head:
 
         advance2_kil:
         add [score2+1],5
+        call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
         mov di, offset statues2_scoreinc
@@ -6928,6 +6959,7 @@ snake2Head:
                 Freeze2:
                 cmp dl,0
                 jnz Poison2
+                call ClearScreenStatues
                 mov Freeze_active,1
                 mov Freeze_S2,1
         mov y,2
@@ -6940,6 +6972,7 @@ snake2Head:
         Poison2:
         cmp dl,1
         jnz Kill2
+        call ClearScreenStatues
         mov poison_active_2,1
         mov poison_s2,1
         mov y,2
@@ -6952,6 +6985,7 @@ snake2Head:
        Kill2:
         cmp dl,2
         jnz Death2
+        call ClearScreenStatues
         add [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
@@ -6962,6 +6996,7 @@ snake2Head:
         Death2:
         cmp dl,3
         jnz advance2
+        call ClearScreenStatues
         sub [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
@@ -7317,6 +7352,7 @@ ClearScreen:
 MAIN    PROC FAR               
         MOV AX,@DATA
         MOV DS,AX  
+        assume ds:@DATA
         mov ES,AX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;         ; Chg Vid Mode To Grphcs
         mov ah,0                       
@@ -7376,17 +7412,13 @@ jmp Again2 ;Loop if the user doesn't choose the correct button
 
 
 I:
-    mov ax,@DATA
-                mov ds,ax
-                assume ds:@DATA
+mov level,0
 inc level
 
 jmp game
 
 K:
-    mov ax,@DATA
-                mov ds,ax
-                assume ds:@DATA
+mov level,0
 add level,2
 jmp game
 
@@ -7416,6 +7448,41 @@ Game:
         mov al,13h
         int 10h 
     
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
+
+        CALL init       
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;INITIALZATION
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+mov [score1],48
+mov [score1+1],48
+mov [score2],48
+mov [score2+1],48
+mov sz1,2d
+mov DirS1,0
+mov IsSnake1Fed,0
+mov sz2,2d
+mov DirS2,2
+mov IsSnake2Fed,0
+mov Num_Of_Times_1,0
+mov Num_Of_Times_2,0
+mov Num_Of_LOOPs_S1,0
+mov Num_Of_LOOPs_S2,0
+mov Freeze_S1,0
+mov Freeze_S2,0
+mov poison_S1,0
+mov poison_S2,0
+mov poison_active_1,0
+mov poison_active_2,0
+mov Freeze_active,0
+        
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+cmp is_main,1
+jz L1
+
+jmp secondary
+
+L1:
 mov y,0
 mov x,1      ;Setting X,Y position of the text.
 mov di, offset P1  ;Print colored text
@@ -7427,21 +7494,7 @@ mov di, offset P2
 call print
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        initialize snakes
 
-        CALL init       
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-mov [score1],48
-mov [score1+1],48
-mov [score2],48
-mov [score2+1],48
-
-cmp is_main,1
-jz L1
-
-jmp secondary
-
-L1:
        Score1_L1:
         cmp [score1+1],58
         jL Score1_L1_2
@@ -7457,7 +7510,7 @@ L1:
         add [score1+1],10
        
        Score1_L1_3:
-        cmp [score1+1],51
+        cmp [score1],51
         jL Score2_L1
         jmp Win1
 
@@ -7476,7 +7529,7 @@ L1:
         jmp printscoreL1
 
 Score2_L1_3:
-        cmp [score2+1],51
+        cmp [score2],51
         jl printscoreL1
         jmp win2
 win_1:
@@ -7498,7 +7551,6 @@ jmp Win2
 
      
        
-       
         ; CALL feedsnake
         ; check the level
 
@@ -7507,7 +7559,7 @@ jmp Win2
         
         Level1:
         MOV CX, 02H		;cx:dx is used as a register of the time in microsec.
-        MOV DX, 1300H
+        MOV DX, 300H
         MOV AH, 86H	
         INT 15H			;delay interrupt int 15h / ah = 86h
         jmp Freeze_1		
@@ -7516,7 +7568,7 @@ jmp Win2
         Level2:
                                 ; delay function
         MOV CX, 01H		;cx:dx is used as a register of the time in microsec.
-        MOV DX, 1300H
+        MOV DX, 1800H
         MOV AH, 86H		;delay interrupt int 15h / ah = 86h
         INT 15H
      
@@ -8365,6 +8417,9 @@ Win1:
         mov al,13h
         int 10h 
         call DrawingWin1
+        mov ah,0                       
+        mov al,13h
+        int 10h 
         jmp MAIN
 
 
@@ -8378,6 +8433,9 @@ Win2:
         mov al,13h
         int 10h 
         call DrawingWin2
+        mov ah,0                       
+        mov al,13h
+        int 10h 
         jmp MAIN
 
 

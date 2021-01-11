@@ -5262,14 +5262,14 @@ imgW    Db      ?
         level                   dw      0
         Score1                  db      48,48,'$'
         Score2                  db      48,48,'$'
-        statues1_poison         db      "Player1 ate poison ",'$'
-        statues1_ice            db      "Player2 has been freezed",'$'
-        statues1_scoreinc       db      "Player1 inc 5 score",'$'
-        statues1_scoredec       db      "Player1 dec 5 score",'$'
-        statues2_poison         db      "Player2 ate poison ",'$'
-        statues2_ice            db      "Player1 has been freezed",'$'
-        statues2_scoreinc       db      "Player2 inc 5 score",'$'
-        statues2_scoredec       db      "Player2 dec 5 score",'$'
+        statues1_poison         db      " ate poison ",'$'
+        statues1_ice            db      " has been freezed",'$'
+        statues1_scoreinc       db      " inc 5 score",'$'
+        statues1_scoredec       db      " dec 5 score",'$'
+        statues2_poison         db      " ate poison ",'$'
+        statues2_ice            db      " has been freezed",'$'
+        statues2_scoreinc       db      " inc 5 score",'$'
+        statues2_scoredec       db      " dec 5 score",'$'
         statues_empty_hh        db      25 dup(' '),'$'
         curr_statues            Dw      ?
         emptymsg                db      '$','$'
@@ -7093,6 +7093,10 @@ snake1head:
         call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_ice
         mov curr_statues,di
         call print
@@ -7109,6 +7113,10 @@ snake1head:
         call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_poison
         mov curr_statues,di
         call print
@@ -7134,6 +7142,10 @@ snake1head:
         call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_scoredec
         mov curr_statues,di
         call print
@@ -7156,6 +7168,10 @@ snake1head:
         call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_scoreinc
         mov curr_statues,di
         call print
@@ -7189,7 +7205,11 @@ snake1head:
                 mov Freeze_S1,1
                 mov y,2
                 mov x,10  ;Setting X,Y position of the text
-                mov di, offset statues1_ice
+               mov di, offset NameP2
+                call print
+                mov y,2
+                 mov x,20  ;Setting X,Y position of the text
+                 mov di, offset statues1_ice
                 mov curr_statues,di
                 call print
 
@@ -7202,6 +7222,10 @@ snake1head:
         mov poison_s1,1
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_poison
         mov curr_statues,di
         call print
@@ -7213,6 +7237,10 @@ snake1head:
         add [score1+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_scoreinc
         mov curr_statues,di
         call print
@@ -7224,6 +7252,10 @@ snake1head:
         sub [score1+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues1_scoredec
         mov curr_statues,di
         call print
@@ -7465,6 +7497,10 @@ snake2Head:
         mov Freeze_active,1
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_ice
         mov curr_statues,di
         call print
@@ -7481,6 +7517,10 @@ snake2Head:
         mov poison_s2,1
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_poison
         mov curr_statues,di
         call print
@@ -7507,6 +7547,10 @@ snake2Head:
         sub [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_scoredec
         mov curr_statues,di
         call print
@@ -7528,6 +7572,10 @@ snake2Head:
         call ClearScreenStatues
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_scoreinc
         mov curr_statues,di
         call print
@@ -7561,6 +7609,10 @@ snake2Head:
                 mov Freeze_S2,1
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP1
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_ice
         mov curr_statues,di
         call print
@@ -7574,6 +7626,10 @@ snake2Head:
         mov poison_s2,1
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_poison
         mov curr_statues,di
         call print
@@ -7586,6 +7642,10 @@ snake2Head:
         add [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_scoreinc
         mov curr_statues,di
         call print
@@ -7597,6 +7657,10 @@ snake2Head:
         sub [score2+1],5
         mov y,2
         mov x,10  ;Setting X,Y position of the text
+        mov di, offset NameP2
+        call print
+        mov y,2
+        mov x,20  ;Setting X,Y position of the text
         mov di, offset statues2_scoredec
         mov curr_statues,di
         call print
@@ -7872,7 +7936,7 @@ MAIN   PROC FAR
 
 ;[[[
 CMP Z,1
-JNE Skip5
+Jmp Skip5
 
 ; Taking Name
         mov x,5

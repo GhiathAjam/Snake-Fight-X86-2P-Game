@@ -6,7 +6,6 @@ Assmebly 8086 Two-Player Game (Both One PC and Two PCs!)
 - [Chat Preview](#Chat)
 - [Main-Menu Preview](#Main-Menu)
 - [Game Preview](#Game)
-- [Software Used](#Software Used)
 - [Contributors](#Contributors)
 
 

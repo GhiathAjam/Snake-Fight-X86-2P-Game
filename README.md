@@ -6,6 +6,7 @@ Assmebly 8086 Two-Player Game (Both One PC and Two PCs!)
 - [Chat Preview](#Chat)
 - [Main-Menu Preview](#Main-Menu)
 - [Game Preview](#Game)
+- [Software Used](#Software Used)
 - [Contributors](#Contributors)
 
 
@@ -16,9 +17,9 @@ Assmebly 8086 Two-Player Game (Both One PC and Two PCs!)
 ### Idle:
 ![Main-Menu](Screenshots/Main_Menu_Idle.png)
 ### Sending Invitation:
-![Main-Menu](Screenshots/Main_Menu_Inv.png)
+![Main-Menu](Screenshots/Main_Menu_Game_Inv.png)
 ### Accepting Invitation:
-![Main-Menu](Screenshots/Main_Menu_Inv_Accepted.png)
+![Main-Menu](Screenshots/Main_Menu_Game_Inv_Accepted.png)
 
 ## Game
 ![Game](Screenshots/In-Game.png)
@@ -27,6 +28,12 @@ Assmebly 8086 Two-Player Game (Both One PC and Two PCs!)
 
 ## Note:-
 -Two PCs Gameplay Requires Serial Port Communication.
+
+
+## Software Used
+- VsCode
+- MASM/TASM Extension for VsCode
+- Virtual Serial Port Driver By Eltima
 
 ## Contributors
 - https://github.com/GhiathAjam

@@ -5270,11 +5270,12 @@ imgW    Db      ?
         statues2_ice            db      " has been freezed",'$'
         statues2_scoreinc       db      " inc 5 score   ",'$'
         statues2_scoredec       db      " dec 5 score   ",'$'
-        statues_empty_hh        db      25 dup(' '),'$'
+        statues_empty_hh        db      28 dup(' '),'$'
         curr_statues            Dw      ?
         curr_s_p                dW      ?
         emptymsg                db      '$','$'
-;
+        ExchangingNamesMsg      db      "To Exchange Names Press S", 10,13," Any Other key to go to Two Players-One PC$",
+
 ;-------------------------------------------------------------------------------------------------
 ;----------------------SNAKE STUFF----------------------------------
 ;-------------------------------------------------------------------------------------------------
@@ -7986,6 +7987,20 @@ JnE Skip5
         mov [si]+bx+2,dl
 
 ; ExCHAnGe NAMES
+        mov y,5
+        mov x,5
+        call gotoxy
+        mov dx,offset ExchangingNamesMsg
+        mov ah,9
+        int 21h
+
+        mov ah,0                                ;INT 16h / AH = 01h - check for keystroke in the keyboard buffer.
+        int 16h                                 ;return:
+        cmp ah,01FH     ; S
+        je Xchg_start
+        jmp O
+
+        Xchg_start:
         lea si,NameP1
         lea di,NameP2
         dec si
